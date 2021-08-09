@@ -10,11 +10,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="540" Height="383">
 
     <Grid>
-        <Button Name="AddButton" Content="Add" Margin="365,136,0,0" VerticalAlignment="Top" RenderTransformOrigin="-7.51,0.406" Click="Add_Button_Click"/>
+        <Button Name="AddButton" Content="Add" Margin="365,136,0,0" VerticalAlignment="Top" RenderTransformOrigin="-7.51,0.406" Click="Open_Add_Dialog"/>
+        <!--
         <TextBox Name="clientNameInput" HorizontalAlignment="Left" Margin="365,25,5,0" PlaceholderText="Name" TextWrapping="NoWrap" VerticalAlignment="Top" Width="165"/>
         <TextBox Name="ipInput" HorizontalAlignment="Left" Margin="365,62,5,0" PlaceholderText="IP/Hostname" VerticalAlignment="Top" Width="165"/>
         <TextBox Name="macInput" HorizontalAlignment="Left" Margin="365,99,5,0" PlaceholderText="MAC" VerticalAlignment="Top" Width="165" ui:TextBoxExtensions.CustomMask="x:[0-F]" ui:TextBoxExtensions.Mask="xx:xx:xx:xx:xx:xx"/>
-       
+-->
         <ListView x:Name="TargetList" BorderThickness="1"
                   BorderBrush="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
                   Width="350" HorizontalAlignment="Left" Margin="10,10,0,52" SelectionMode="Single" IsItemClickEnabled="False">
@@ -30,5 +31,34 @@
         </ListView>
         <Button Name="SendButton" Content="Send" Margin="10,336,0,0" VerticalAlignment="Top" RenderTransformOrigin="-7.51,0.406" Click="Send_Button_Click"/>
         <Button Name="DeleteButton" Content="Delete" Margin="66,336,0,0" VerticalAlignment="Top" RenderTransformOrigin="-7.51,0.406" Click="Delete_Button_Click"/>
+        <ContentDialog x:Name="addHostDialog"
+           PrimaryButtonText="Save" IsPrimaryButtonEnabled="False"
+           CloseButtonText="Cancel">
+            <ContentDialog.TitleTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Add Host"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ContentDialog.TitleTemplate>
+            <StackPanel Orientation="Vertical">
+                <TextBox Name="clientNameInput" HorizontalAlignment="Stretch" PlaceholderText="Name" TextWrapping="NoWrap"/>
+                <TextBox Name="ipInput" HorizontalAlignment="Stretch" PlaceholderText="IP/Hostname"/>
+                <StackPanel Orientation="Horizontal">
+                    <local:macInputField Name="macInput0"/>
+                    <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
+                    <local:macInputField Name="macInput1"/>
+                    <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
+                    <local:macInputField Name="macInput2"/>
+                    <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
+                    <local:macInputField Name="macInput3"/>
+                    <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
+                    <local:macInputField Name="macInput4"/>
+                    <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
+                    <local:macInputField Name="macInput5"/>
+                </StackPanel>
+                <TextBox Name="portInput" HorizontalAlignment="Stretch" PlaceholderText="Port (optional)"/>
+            </StackPanel>
+        </ContentDialog>
     </Grid>
 </Page>

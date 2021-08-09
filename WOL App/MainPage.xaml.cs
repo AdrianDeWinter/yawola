@@ -1,22 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using Windows.Networking.Sockets;
-using Windows.Networking;
 using Windows.Storage.Streams;
 using System.Collections.ObjectModel;
+using Microsoft.Toolkit.Uwp.UI;
 
 namespace WOL_App
 {
@@ -78,7 +67,7 @@ namespace WOL_App
 
         private void Add_Button_Click(object sender, RoutedEventArgs e)
         {
-            WolTarget target = new WolTarget(ipInput.Text, macInput.Text, clientNameInput.Text, "9999");
+            WolTarget target = new WolTarget(ipInput.Text, macInput1.Text, clientNameInput.Text, "9999");
             targets.Add(target);
             if (debug)
             {
@@ -92,6 +81,31 @@ namespace WOL_App
         private void Delete_Button_Click(object sender, RoutedEventArgs e)
         {
             targets.Remove((WolTarget)TargetList.SelectedItem);
+        }
+
+        private void MacInput_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox activeBox = (TextBox)sender;
+            if (!TextBoxExtensions.GetIsValid(activeBox))
+            {
+
+            }
+            switch (activeBox.Name)
+            {
+                case "macInput1": break;
+                case "macInput2": break;
+                case "macInput3": break;
+                case "macInput4": break;
+                case "macInput5": break;
+                case "macInput6": break;
+                default:
+                    break;
+            }
+        }
+
+        private async void Open_Add_Dialog(object sender, RoutedEventArgs e)
+        {
+            ContentDialogResult result = await addHostDialog.ShowAsync();
         }
     }
 }
