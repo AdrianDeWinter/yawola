@@ -9,5 +9,5 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
-    <TextBox Name="macInput" ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2"/>
+    <TextBox Name="textBox" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2"/>
 </UserControl>

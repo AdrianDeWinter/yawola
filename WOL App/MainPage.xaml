@@ -31,9 +31,13 @@
         </ListView>
         <Button Name="SendButton" Content="Send" Margin="10,336,0,0" VerticalAlignment="Top" RenderTransformOrigin="-7.51,0.406" Click="Send_Button_Click"/>
         <Button Name="DeleteButton" Content="Delete" Margin="66,336,0,0" VerticalAlignment="Top" RenderTransformOrigin="-7.51,0.406" Click="Delete_Button_Click"/>
-        <ContentDialog x:Name="addHostDialog"
-           PrimaryButtonText="Save" IsPrimaryButtonEnabled="False"
-           CloseButtonText="Cancel">
+        <ContentDialog
+            x:Name="addHostDialog"
+            PrimaryButtonText="Save"
+            PrimaryButtonClick="Add_Host"
+            IsPrimaryButtonEnabled="False"
+            CloseButtonText="Cancel"
+            DefaultButton="Primary">
             <ContentDialog.TitleTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -42,22 +46,22 @@
                 </DataTemplate>
             </ContentDialog.TitleTemplate>
             <StackPanel Orientation="Vertical">
-                <TextBox Name="clientNameInput" HorizontalAlignment="Stretch" PlaceholderText="Name" TextWrapping="NoWrap"/>
-                <TextBox Name="ipInput" HorizontalAlignment="Stretch" PlaceholderText="IP/Hostname"/>
-                <StackPanel Orientation="Horizontal">
-                    <local:macInputField Name="macInput0"/>
+                <TextBox Name="clientNameInput" InputScope="Text" HorizontalAlignment="Stretch" PlaceholderText="Name" TextWrapping="NoWrap" TextChanged="ValidateAddHostForm"/>
+                <TextBox Name="ipInput" InputScope="AlphanumericFullWidth" HorizontalAlignment="Stretch" PlaceholderText="IP/Hostname" TextChanged="ValidateAddHostForm"/>
+                <StackPanel Orientation="Horizontal" Name="macInputStack">
+                    <TextBox Name="macInput0" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <local:macInputField Name="macInput1"/>
+                    <TextBox Name="macInput1" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <local:macInputField Name="macInput2"/>
+                    <TextBox Name="macInput2" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <local:macInputField Name="macInput3"/>
+                    <TextBox Name="macInput3" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <local:macInputField Name="macInput4"/>
+                    <TextBox Name="macInput4" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <local:macInputField Name="macInput5"/>
+                    <TextBox Name="macInput5" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                 </StackPanel>
-                <TextBox Name="portInput" HorizontalAlignment="Stretch" PlaceholderText="Port (optional)"/>
+                <TextBox Name="portInput" InputScope="Number" HorizontalAlignment="Stretch" PlaceholderText="Port (optional)" ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Number" TextChanged="ValidateAddHostForm"/>
             </StackPanel>
         </ContentDialog>
     </Grid>
