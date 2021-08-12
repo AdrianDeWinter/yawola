@@ -57,12 +57,23 @@ namespace WOL_App
         /// <param name="mac">the mac address in the form <c>12:34:56:78:9A:BC</c></param>
         /// <param name="name">a simple display name, has no actual functionality</param>
         /// <param name="port">the udp port number to use. may only contain decimal digits</param>
+        /// <exception cref="ArgumentException">Thrown if an invalid parameter was passed, see the exception message for mor info</exception>
+        /// <exception cref="ArgumentNullException">Thrown if null was passed to a parameter, see the exception message for more info</exception>
         public WolTarget(string address, string mac, string name, string port = "0")
         {
-            Name = name;
-            SetAddress(address);
-            SetPort(port);
-            SetMac(mac);
+            if (name == null || name.Length == 0)
+                throw new ArgumentException("The display name for a WolTarget cannot be empty");
+            Name = name ?? throw new ArgumentNullException("The display name for a WolTarget cannot be null");
+            try
+            {
+                SetAddress(address);
+                SetPort(port);
+                SetMac(mac);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
         /// <summary>
         /// Creates a new instance of wolTarget. This overload accepts the mac address in the form of an array of six two char long strings.<br/>
@@ -72,20 +83,39 @@ namespace WOL_App
         /// <param name="mac">the mac address in the form of an array of six strings</param>
         /// <param name="name">a simple display name, has no actual functionality</param>
         /// <param name="port">the udp port number to use. may only contain decimal digits</param>
+        /// <exception cref="ArgumentException">Thrown if an invalid parameter was passed, see the exception message for more info</exception>
+        /// <exception cref="ArgumentNullException">Thrown if null was passed to a parameter, see the exception message for more info</exception>
         public WolTarget(string address, string[] mac, string name, string port = "0")
         {
-            Name = name;
-            SetAddress(address);
-            SetPort(port);
-            ParseMac(mac);
+            //evaluate the name string, throw appropriate exception if necessary
+            if (name.Length == 0)
+                throw new ArgumentException("The display name for a WolTarget cannot be empty");
+            Name = name ?? throw new ArgumentNullException("The display name for a WolTarget cannot be null");
+
+            try
+            {
+                SetAddress(address);
+                SetPort(port);
+                ParseMac(mac);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
         /// <summary>
         /// Sets the <see cref="Address"/> and <see cref="HostName"/> members
         /// </summary>
         /// <param name="address">An IPv4 address, IPv6 address, hostName, or url</param>
+        /// <exception cref="ArgumentException">Thrown if an invalid parameter was passed, see the exception message for more info</exception>
+        /// <exception cref="ArgumentNullException">Thrown if null was passed to a parameter, see the exception message for more info</exception>
         public void SetAddress(string address)
         {
-            Address = address;
+            //evaluate the name string, throw appropriate exception if necessary
+            if (address.Length == 0)
+                throw new ArgumentException("The display name for a WolTarget cannot be empty");
+            Address = address ?? throw new ArgumentNullException("The display name for a WolTarget cannot be null");
+
             HostName = new HostName(address);
         }
         /// <summary>
