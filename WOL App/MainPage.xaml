@@ -67,7 +67,7 @@
             <StackPanel Orientation="Vertical" Width="Auto">
                 <TextBox Name="clientNameInput" InputScope="Text" HorizontalAlignment="Stretch" PlaceholderText="Name" TextWrapping="NoWrap" TextChanged="ValidateAddHostForm"/>
                 <TextBox Name="ipInput" InputScope="AlphanumericFullWidth" HorizontalAlignment="Stretch" PlaceholderText="IP/Hostname" TextChanged="ValidateAddHostForm"/>
-                <controls:DockPanel Name="macInputStack" Width="Auto">
+                <controls:DockPanel x:Name="macInputStack" Width="Auto">
                     <TextBox Name="macInput0" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin" ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm" Text=""/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
                     <TextBox Name="macInput1" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>

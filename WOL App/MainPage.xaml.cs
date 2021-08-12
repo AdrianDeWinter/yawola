@@ -32,7 +32,7 @@ namespace WOL_App
         private void Send_Button_Click(object sender, RoutedEventArgs e)
         {
             WolTarget target = (WolTarget)TargetList.SelectedItem;
-            target.SendMagicPacket(debug);
+            _ = target.SendMagicPacket(debug);
         }
 
         private void Add_Host(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -61,8 +61,8 @@ namespace WOL_App
         private async void Open_Add_Dialog(object sender, RoutedEventArgs e)
         {
             //set the dialog visible as it might have been set to invisible in the xaml ui editor
-            addHostDialog.Visibility = Visibility.Visible;
             _ = await addHostDialog.ShowAsync();
+            addHostDialog.Visibility = Visibility.Visible;
         }
 
         private void ValidateAddHostForm(object sender, TextChangedEventArgs args)
