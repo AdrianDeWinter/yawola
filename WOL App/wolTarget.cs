@@ -6,34 +6,25 @@ using Windows.Networking.Sockets;
 
 namespace WOL_App
 {
-    public struct WolTarget
+    public class WolTarget
     {
-        public string Address { get; private set; }
-        public string Port { get; private set; }
-        public string Mac_string { get; private set; }
-        public string Name { get; private set; }
-        
-        private byte[] Mac { get; set; }
-        private HostName HostName { get; set; }
+        public string Address { get; private set; } = "";
+        public string Port { get; private set; } = "";
+        public string Mac_string { get; private set; } = "";
+        public string Name { get; private set; } = "";
+
+        private byte[] Mac { get; set; } = new byte[102];
+        private HostName HostName { get; set; } = null;
 
         public WolTarget(string address, string mac, string name, string port = "0")
         {
-            Address = "";
-            HostName = null;
-            Port = port;
-            Mac = new byte[102];
-            Mac_string = "";
             Name = name;
             SetAddress(address);
+            SetPort(port);
             SetMac(mac);
         }
         public WolTarget(string address, string[] mac, string name, string port = "0")
         {
-            Address = "";
-            HostName = null;
-            Port = "";
-            Mac = new byte[102];
-            Mac_string = "";
             Name = name;
             SetAddress(address);
             SetPort(port);
@@ -44,7 +35,6 @@ namespace WOL_App
             Address = address;
             HostName = new HostName(address);
         }
-
         public void SetMac(string mac)
         {
             Mac_string = mac;
@@ -53,7 +43,6 @@ namespace WOL_App
 
             ParseMac(macArray);
         }
-
         private void ParseMac(string[] macSubstrings)
         {
             Mac = new byte[6];
@@ -82,13 +71,11 @@ namespace WOL_App
                     Mac_string += ":";
             }
         }
-
         public void SetPort(string port)
         {
             Port = port;
         }
-
-        public byte[] MagicPacket()
+        private byte[] MagicPacket()
         {
             byte[] packet = new byte[102];
 
@@ -103,7 +90,6 @@ namespace WOL_App
 
             return packet;
         }
-
         public async void SendMagicPacket(bool debug = false)
         {
             if (debug)
@@ -143,7 +129,6 @@ namespace WOL_App
             if (debug)
                 Debug.WriteLine("Packet sent");
         }
-
         public override string ToString()
         {
             return "Display Name: " + Name + "\nAddress: " + Address + "\nMAC: " + Mac_string + "\nPort: " + Port;
