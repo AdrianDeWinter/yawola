@@ -2,3 +2,21 @@
 
 # IDE0011: Add braces
 csharp_prefer_braces = false
+
+# IDE0003: Remove qualification
+dotnet_style_qualification_for_method = true
+
+# IDE0003: Remove qualification
+dotnet_style_qualification_for_property = false
+
+# IDE0003: Remove qualification
+dotnet_style_qualification_for_event = true
+
+# IDE0003: Remove qualification
+dotnet_style_qualification_for_field = true
+
+[*.{cs,vb}]
+dotnet_style_qualification_for_field=false:silent
+dotnet_style_qualification_for_method=false:silent
+dotnet_style_qualification_for_event=false:silent
+indent_style=tab
