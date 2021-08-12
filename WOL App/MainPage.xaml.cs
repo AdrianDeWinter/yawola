@@ -125,7 +125,7 @@ namespace WOL_App
         }
 
         /// <summary>
-        /// Callback for the <see cref="addHostDialog"/>s secondary button. Clears all inputs
+        /// Callback for the <see cref="addHostDialog"/>s secondary button. Clears all inputs made in the dialog.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
