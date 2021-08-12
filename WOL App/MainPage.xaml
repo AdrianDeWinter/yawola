@@ -47,7 +47,6 @@
         <ContentDialog
             Width="Auto"
             Margin="10,10,10,10"
-            Visibility="Collapsed"
             x:Name="addHostDialog"
             PrimaryButtonText="Save"
             PrimaryButtonClick="Add_Host"
@@ -56,7 +55,7 @@
             CloseButtonClick="AddHostDialog_CloseButtonClick"
             DefaultButton="Primary"
             Grid.ColumnSpan="2"
-            x:DeferLoadStrategy="Lazy">
+            d:IsHidden="True">
             <ContentDialog.TitleTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">

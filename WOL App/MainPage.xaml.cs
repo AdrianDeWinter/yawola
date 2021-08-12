@@ -60,9 +60,7 @@ namespace WOL_App
 
         private async void Open_Add_Dialog(object sender, RoutedEventArgs e)
         {
-            //set the dialog visible as it might have been set to invisible in the xaml ui editor
             _ = await addHostDialog.ShowAsync();
-            addHostDialog.Visibility = Visibility.Visible;
         }
 
         private void ValidateAddHostForm(object sender, TextChangedEventArgs args)
