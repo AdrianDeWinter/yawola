@@ -57,7 +57,7 @@ namespace WOL_App
         /// <param name="port">the udp port number to use. may only contain decimal digits</param>
         /// <exception cref="ArgumentException">Thrown if an invalid parameter was passed, see the exception message for mor info</exception>
         /// <exception cref="ArgumentNullException">Thrown if null was passed to a parameter, see the exception message for more info</exception>
-        public WolTarget(string address, string mac, string name, string port = "0")
+        public WolTarget(string address, string mac, string name, string port = "9999")
         {
             if (name == null || name.Length == 0)
                 throw new ArgumentException("The display name for a WolTarget cannot be empty");
@@ -83,7 +83,7 @@ namespace WOL_App
         /// <param name="port">the udp port number to use. may only contain decimal digits</param>
         /// <exception cref="ArgumentException">Thrown if an invalid parameter was passed, see the exception message for more info</exception>
         /// <exception cref="ArgumentNullException">Thrown if null was passed to a parameter, see the exception message for more info</exception>
-        public WolTarget(string address, string[] mac, string name, string port = "0")
+        public WolTarget(string address, string[] mac, string name, string port = "9999")
         {
             //evaluate the name string, throw appropriate exception if necessary
             if (name.Length == 0)
@@ -189,24 +189,29 @@ namespace WOL_App
                 Mac[i] = new_mac[i];
         }
         /// <summary>
-        /// 
+        /// Sets the port string on the object.
         /// </summary>
-        /// <param name="port"></param>
+        /// <param name="port">The port to use</param>
         /// <exception cref="ArgumentNullException">Thrown if the string was null</exception>
         /// <exception cref="FormatException">Thrown if the string was not of the correct format.</exception>
         /// <exception cref="OverflowException">Thrown if a part of the string represents a number less than 0 or greater than 65535.</exception>
         public void SetPort(string port)
         {
-            //parse the port string as an int to ensure it is a valid port number
-            try
+            if (port.Length == 0)
+                Port = "9999";
+            else
             {
-                ushort p = ushort.Parse(port);
+                //parse the port string as an int to ensure it is a valid port number
+                try
+                {
+                    ushort p = ushort.Parse(port);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                Port = port;
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            Port = port;
         }
         /// <summary>
         /// Builds an returns a magic packet for this host.
@@ -269,6 +274,10 @@ namespace WOL_App
         public override string ToString()
         {
             return "Display Name: " + Name + "\nAddress: " + Address + "\nMAC: " + Mac_string + "\nPort: " + Port;
+        }
+        public string AddressAndPortString()
+        {
+            return Address + ":" + Port;
         }
     }
 }

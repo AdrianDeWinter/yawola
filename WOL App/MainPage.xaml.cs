@@ -55,11 +55,9 @@ namespace WOL_App
         }
 
         /// <summary>
-        /// Callback for the addHostDialogs primaryButton. Creates a new instance of WolTarget and adds it to <see cref="targets"/>
+        /// Creates a new instance of WolTarget and adds it to <see cref="targets"/>
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void Add_Host(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private void Add_Host()
         {
             string[] mac = {
                 macInput0.Text, macInput1.Text ,
@@ -123,16 +121,43 @@ namespace WOL_App
             if (debug)
                 Debug.WriteLine("Validation failed");
         }
+        /// <summary>
+        /// Function to clear all fields in the addHostDialog. Is called by <see cref="Add_Host"/> and <see cref="AddHostDialog_CloseButtonClick"/>
+        /// </summary>
+        private void ClearDialogFields()
+        {
+            foreach (TextBox box in popupFields)
+                box.Text = "";
+        }
+        /// <summary>
+        /// Callback for the <see cref="addHostDialog"/>'s primary button. Clears all inputs made in the dialog and adds the new host to <see cref="targets"/>.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void AddHostDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            Add_Host();
+            ClearDialogFields();
+        }
 
         /// <summary>
-        /// Callback for the <see cref="addHostDialog"/>s secondary button. Clears all inputs made in the dialog.
+        /// Callback for the <see cref="addHostDialog"/>'s secondary button. Clears all inputs made in the dialog.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
         private void AddHostDialog_CloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            foreach (TextBox box in popupFields)
-                box.Text = "";
+            ClearDialogFields();
+        }
+
+        /// <summary>
+        /// Event handler for the SelectionChanged event on the <see cref="TargetList"/>. Updates the <see cref="SendButton"/>'s IsEnabled property
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TargetList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SendButton.IsEnabled = TargetList.SelectedItem != null;
         }
     }
 }
