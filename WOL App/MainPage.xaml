@@ -6,19 +6,24 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="540" Height="383">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="350" Height="350">
 
     <Grid>
-        <Button Name="AddButton" Content="Add" Margin="365,136,0,0" VerticalAlignment="Top" RenderTransformOrigin="-7.51,0.406" Click="Open_Add_Dialog"/>
-        <!--
-        <TextBox Name="clientNameInput" HorizontalAlignment="Left" Margin="365,25,5,0" PlaceholderText="Name" TextWrapping="NoWrap" VerticalAlignment="Top" Width="165"/>
-        <TextBox Name="ipInput" HorizontalAlignment="Left" Margin="365,62,5,0" PlaceholderText="IP/Hostname" VerticalAlignment="Top" Width="165"/>
-        <TextBox Name="macInput" HorizontalAlignment="Left" Margin="365,99,5,0" PlaceholderText="MAC" VerticalAlignment="Top" Width="165" ui:TextBoxExtensions.CustomMask="x:[0-F]" ui:TextBoxExtensions.Mask="xx:xx:xx:xx:xx:xx"/>
--->
-        <ListView x:Name="TargetList" BorderThickness="1"
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="70"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <ListView x:Name="TargetList" BorderThickness="2"
                   BorderBrush="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                  Width="350" HorizontalAlignment="Left" Margin="10,10,0,52" SelectionMode="Single" IsItemClickEnabled="False">
+                  HorizontalAlignment="Left" Margin="5,5,5,5"
+                  Width="270"
+                  SelectionMode="Single" IsItemClickEnabled="False"
+                  Grid.RowSpan="2" Grid.Column="0">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:WolTarget">
                     <StackPanel Orientation="Vertical">
@@ -29,15 +34,29 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button Name="SendButton" Content="Send" Margin="10,336,0,0" VerticalAlignment="Top" RenderTransformOrigin="-7.51,0.406" Click="Send_Button_Click"/>
-        <Button Name="DeleteButton" Content="Delete" Margin="66,336,0,0" VerticalAlignment="Top" RenderTransformOrigin="-7.51,0.406" Click="Delete_Button_Click"/>
+        <Button Name="AddButton" Content="Add" Click="Open_Add_Dialog"
+                VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
+                HorizontalAlignment="Stretch"/>
+        <Button Name="SendButton" Content="Send" Click="Send_Button_Click"
+                Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
+                HorizontalAlignment="Stretch"/>
+        <Button Name="DeleteButton" Content="Delete" Click="Delete_Button_Click"
+                VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
+                HorizontalAlignment="Stretch"/>
+        <!-- This content dialogs visibility is set to hidden to make the app itself visible in the editor -->
         <ContentDialog
+            Width="Auto"
+            Margin="10,10,10,10"
+            Visibility="Collapsed"
             x:Name="addHostDialog"
             PrimaryButtonText="Save"
             PrimaryButtonClick="Add_Host"
             IsPrimaryButtonEnabled="False"
             CloseButtonText="Cancel"
-            DefaultButton="Primary">
+            CloseButtonClick="AddHostDialog_CloseButtonClick"
+            DefaultButton="Primary"
+            Grid.ColumnSpan="2"
+            x:DeferLoadStrategy="Lazy">
             <ContentDialog.TitleTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -45,22 +64,22 @@
                     </StackPanel>
                 </DataTemplate>
             </ContentDialog.TitleTemplate>
-            <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" Width="Auto">
                 <TextBox Name="clientNameInput" InputScope="Text" HorizontalAlignment="Stretch" PlaceholderText="Name" TextWrapping="NoWrap" TextChanged="ValidateAddHostForm"/>
                 <TextBox Name="ipInput" InputScope="AlphanumericFullWidth" HorizontalAlignment="Stretch" PlaceholderText="IP/Hostname" TextChanged="ValidateAddHostForm"/>
-                <StackPanel Orientation="Horizontal" Name="macInputStack">
-                    <TextBox Name="macInput0" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
+                <controls:DockPanel Name="macInputStack" Width="Auto">
+                    <TextBox Name="macInput0" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin" ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm" Text=""/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <TextBox Name="macInput1" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
+                    <TextBox Name="macInput1" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <TextBox Name="macInput2" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
+                    <TextBox Name="macInput2" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <TextBox Name="macInput3" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
+                    <TextBox Name="macInput3" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <TextBox Name="macInput4" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
+                    <TextBox Name="macInput4" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
-                    <TextBox Name="macInput5" TextAlignment="Center" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
-                </StackPanel>
+                    <TextBox Name="macInput5" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
+                </controls:DockPanel>
                 <TextBox Name="portInput" InputScope="Number" HorizontalAlignment="Stretch" PlaceholderText="Port (optional)" ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Number" TextChanged="ValidateAddHostForm"/>
             </StackPanel>
         </ContentDialog>

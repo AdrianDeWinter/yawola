@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.Networking.Sockets;
 using System.Collections.ObjectModel;
 
 namespace WOL_App
@@ -10,6 +9,8 @@ namespace WOL_App
     public sealed partial class MainPage : Page
     {
         private readonly bool debug = true;
+
+        private readonly TextBox[] popupFields = new TextBox[9];
 
         public readonly ObservableCollection<WolTarget> targets = new ObservableCollection<WolTarget>();
 
@@ -19,6 +20,15 @@ namespace WOL_App
             TargetList.ItemsSource = targets;
             if (debug)
                 targets.Add(new WolTarget("192.168.188.128", "84:D8:1B:60:D6:AE", "mveServer", "9999"));
+            popupFields[0] = clientNameInput;
+            popupFields[1] = ipInput;
+            popupFields[2] = macInput0;
+            popupFields[3] = macInput1;
+            popupFields[4] = macInput2;
+            popupFields[5] = macInput3;
+            popupFields[6] = macInput4;
+            popupFields[7] = macInput5;
+            popupFields[8] = portInput;
         }
 
         private void Send_Button_Click(object sender, RoutedEventArgs e)
@@ -39,7 +49,7 @@ namespace WOL_App
             if (debug)
             {
                 Debug.WriteLine("Saved target:");
-                Debug.WriteLine(target.HostName);
+                Debug.WriteLine(target.Address);
                 Debug.WriteLine(target.Mac_string);
                 Debug.WriteLine(target.Port);
             }
@@ -52,6 +62,8 @@ namespace WOL_App
 
         private async void Open_Add_Dialog(object sender, RoutedEventArgs e)
         {
+            //set the dialog visible as it might have been set to invisible in the xaml ui editor
+            addHostDialog.Visibility = Visibility.Visible;
             _ = await addHostDialog.ShowAsync();
         }
 
@@ -60,11 +72,24 @@ namespace WOL_App
             if (debug)
                 Debug.WriteLine("Validating Form...");
             //host/ip and display name must be set
-            if (clientNameInput.Text != "" && ipInput.Text != "")
+            if (clientNameInput.Text.Length > 0 && ipInput.Text.Length > 0)
+            {
                 addHostDialog.IsPrimaryButtonEnabled = true;
+                if (debug)
+                    Debug.WriteLine("Validation successful");
+                return;
+            }
             addHostDialog.IsPrimaryButtonEnabled = false;
+            if (debug)
+                Debug.WriteLine("Validation failed");
             //wont check the mac any closer, correctness is suffieciently imposed by the input fields maxLength and Regex
             //ever field being blank will be parsed to 0x00:0x00:0x00:0x00:0x00:0x00, which is (theoretically) a valid mac
+        }
+
+        private void AddHostDialog_CloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            foreach (TextBox box in popupFields)
+                box.Text = "";
         }
     }
 }

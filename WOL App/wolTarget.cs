@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Networking;
 using System.Diagnostics;
 using Windows.Storage.Streams;
@@ -15,10 +11,10 @@ namespace WOL_App
         public string Address { get; private set; }
         public string Port { get; private set; }
         public string Mac_string { get; private set; }
-        public byte[] Mac { get; private set; }
-        public HostName HostName { get; private set; }
-
         public string Name { get; private set; }
+        
+        private byte[] Mac { get; set; }
+        private HostName HostName { get; set; }
 
         public WolTarget(string address, string mac, string name, string port = "0")
         {
@@ -35,11 +31,12 @@ namespace WOL_App
         {
             Address = "";
             HostName = null;
-            Port = port;
+            Port = "";
             Mac = new byte[102];
             Mac_string = "";
             Name = name;
             SetAddress(address);
+            SetPort(port);
             ParseMac(mac);
         }
         public void SetAddress(string address)
@@ -114,12 +111,13 @@ namespace WOL_App
                 Debug.WriteLine("Sending packet:");
                 Debug.WriteLine(ToString());
             }
+
             DatagramSocket socket = new DatagramSocket();
             //get out stream to the selected target
             IOutputStream outStream;
             try
             {
-                outStream = await socket.GetOutputStreamAsync(this.HostName, this.Port);
+                outStream = await socket.GetOutputStreamAsync(HostName, Port);
             }
             catch (Exception except)
             {
@@ -131,7 +129,7 @@ namespace WOL_App
             //write the packet to the stream
             if (debug)
                 Debug.WriteLine("writing data");
-            writer.WriteBytes(this.MagicPacket());
+            writer.WriteBytes(MagicPacket());
             //send the packet
             try
             {
@@ -148,7 +146,7 @@ namespace WOL_App
 
         public override string ToString()
         {
-            return "Display Name: " + Name + "\nAddress: " + Address + "\nMAC: " + Mac_string;
+            return "Display Name: " + Name + "\nAddress: " + Address + "\nMAC: " + Mac_string + "\nPort: " + Port;
         }
     }
 }
