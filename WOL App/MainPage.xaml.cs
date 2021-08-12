@@ -18,8 +18,6 @@ namespace WOL_App
         {
             this.InitializeComponent();
             TargetList.ItemsSource = targets;
-            if (debug)
-                targets.Add(new WolTarget("192.168.188.128", "84:D8:1B:60:D6:AE", "mveServer", "9999"));
             popupFields[0] = clientNameInput;
             popupFields[1] = ipInput;
             popupFields[2] = macInput0;
