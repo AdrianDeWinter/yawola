@@ -21,15 +21,15 @@
         <ListView x:Name="TargetList" BorderThickness="2"
                   BorderBrush="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
                   HorizontalAlignment="Left" Margin="5,5,5,5"
-                  Width="270"
+                  Width="270" SelectionChanged="TargetList_SelectionChanged"
                   SelectionMode="Single" IsItemClickEnabled="False"
                   Grid.RowSpan="2" Grid.Column="0">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:WolTarget">
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="{x:Bind Name}" x:Phase="1" FontSize="18" FontWeight="Bold" Margin="0,5,0,0"/>
-                        <TextBlock Text="{x:Bind Address}" x:Phase="1" Margin="0,0,0,0"/>
-                        <TextBlock Text="{x:Bind Mac_string}" x:Phase="1" Margin="0,0,0,5"/>
+                        <TextBlock Text="{x:Bind AddressAndPortString()}" Margin="0,0,0,0"/>
+                        <TextBlock Text="{x:Bind Mac_string}" Margin="0,0,0,5"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -39,7 +39,7 @@
                 HorizontalAlignment="Stretch"/>
         <Button Name="SendButton" Content="Send" Click="Send_Button_Click"
                 Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
-                HorizontalAlignment="Stretch"/>
+                HorizontalAlignment="Stretch" IsEnabled="false"/>
         <Button Name="DeleteButton" Content="Delete" Click="Delete_Button_Click"
                 VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
                 HorizontalAlignment="Stretch"/>
@@ -49,7 +49,7 @@
             Margin="10,10,10,10"
             x:Name="addHostDialog"
             PrimaryButtonText="Save"
-            PrimaryButtonClick="Add_Host"
+            PrimaryButtonClick="AddHostDialog_PrimaryButtonClick"
             IsPrimaryButtonEnabled="False"
             CloseButtonText="Cancel"
             CloseButtonClick="AddHostDialog_CloseButtonClick"
