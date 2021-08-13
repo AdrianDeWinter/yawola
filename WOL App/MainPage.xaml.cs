@@ -16,6 +16,7 @@ namespace WOL_App
 		/// </summary>
 		private readonly TextBox[] popupFields = new TextBox[9];
 
+		private bool editing = false;
 		/// <summary>
 		/// The constructor called by the system when MainPage is to be displayed. Initializes the page and performs any preperation necessary
 		/// </summary>
@@ -52,13 +53,10 @@ namespace WOL_App
 		/// </summary>
 		private void Add_Host()
 		{
-			string[] mac = {
-				macInput0.Text, macInput1.Text ,
-				macInput2.Text, macInput3.Text ,
-				macInput4.Text, macInput5.Text
-			};
-			WolTarget target = new WolTarget(ipInput.Text, mac, clientNameInput.Text, portInput.Text);
+			WolTarget target = CreateHostObject();
 			AppData.targets.Add(target);
+			if (AppData.debug)
+				Debug.WriteLine("Saving entry no " + AppData.targets.IndexOf(target));
 			if (AppData.debug)
 			{
 				Debug.WriteLine("Saved target:");
@@ -67,9 +65,65 @@ namespace WOL_App
 				Debug.WriteLine(target.Port);
 			}
 		}
+		/// <summary>
+		/// Creates a new instance of WolTarget and replaces the one currently selected in <see cref="TargetList"/>
+		/// </summary>
+		private void UpdateHost()
+		{
+			WolTarget target = CreateHostObject();
+			WolTarget old = (WolTarget)TargetList.SelectedItem;
+			int index = AppData.targets.IndexOf(old);
+			if (AppData.debug)
+				Debug.WriteLine("Saving entry no " + index);
+			_ = AppData.targets.Remove(old);
+			AppData.targets.Insert(index, target);
+			TargetList.SelectedIndex = index;
+			if (AppData.debug)
+			{
+				Debug.WriteLine("Saved target:");
+				Debug.WriteLine(target.Address);
+				Debug.WriteLine(target.Mac_string);
+				Debug.WriteLine(target.Port);
+			}
+		}
+		/// <summary>
+		/// Creates a new instance of WolTarget and returns it
+		/// </summary>
+		/// <returns>The Woltarget generated from the <see cref="addHostDialog"/></returns>
+		private WolTarget CreateHostObject()
+		{
+			string[] mac = {
+				macInput0.Text, macInput1.Text ,
+				macInput2.Text, macInput3.Text ,
+				macInput4.Text, macInput5.Text
+			};
+			return new WolTarget(ipInput.Text, mac, clientNameInput.Text, portInput.Text);
+		}
+		/// <summary>
+		/// Callback for the "Edit" button. Opens the addHostDialog prefilled with the entry selected from <see cref="AppData.targets"/> for editing.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private async void Edit_Button_Click(object sender, RoutedEventArgs e)
+		{
+			editing = true;
+			WolTarget t = (WolTarget)TargetList.SelectedItem;
+			if (AppData.debug)
+				Debug.WriteLine("Editing entry no " + AppData.targets.IndexOf(t));
+			clientNameInput.Text = t.Name;
+			ipInput.Text = t.Address;
+			portInput.Text = t.Port;
+			macInput0.Text = t.Mac_string_array[0];
+			macInput1.Text = t.Mac_string_array[1];
+			macInput2.Text = t.Mac_string_array[2]; 
+			macInput3.Text = t.Mac_string_array[3];
+			macInput4.Text = t.Mac_string_array[4]; 
+			macInput5.Text = t.Mac_string_array[5];
+			_ = await addHostDialog.ShowAsync();
+		}
 
 		/// <summary>
-		/// Callback for the "Delete" button. Removes the selectged entry from <see cref="AppData.targets"/>
+		/// Callback for the "Delete" button. Removes the selected entry from <see cref="AppData.targets"/>
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -98,7 +152,7 @@ namespace WOL_App
 		/// The same goes for the port (which just defaults to "0")</remarks>
 		/// <param name="sender"></param>
 		/// <param name="args"></param>
-		private void ValidateAddHostForm(object sender, TextChangedEventArgs args)
+		private void ValidateAddHostForm(object sender = null, object args = null)
 		{
 			if (AppData.debug)
 				Debug.WriteLine("Validating Form...");
@@ -129,8 +183,12 @@ namespace WOL_App
 		/// <param name="args"></param>
 		private void AddHostDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
 		{
-			Add_Host();
+			if (editing)
+				UpdateHost();
+			else
+				Add_Host();
 			ClearDialogFields();
+			editing = false;
 		}
 
 		/// <summary>
@@ -151,6 +209,7 @@ namespace WOL_App
 		private void TargetList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			SendButton.IsEnabled = TargetList.SelectedItem != null;
+			EditButton.IsEnabled = TargetList.SelectedItem != null;
 		}
 	}
 }

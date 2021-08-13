@@ -40,6 +40,9 @@
         <Button Name="SendButton" Content="Send" Click="Send_Button_Click"
                 Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
                 HorizontalAlignment="Stretch" IsEnabled="false"/>
+        <Button Name="EditButton" Content="Edit" Click="Edit_Button_Click"
+                VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="1" Margin="5,5,5,42"
+                HorizontalAlignment="Stretch" IsEnabled="false"/>
         <Button Name="DeleteButton" Content="Delete" Click="Delete_Button_Click"
                 VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
                 HorizontalAlignment="Stretch"/>
@@ -54,6 +57,7 @@
             CloseButtonText="Cancel"
             CloseButtonClick="AddHostDialog_CloseButtonClick"
             DefaultButton="Primary"
+            Opened="ValidateAddHostForm"
             Grid.ColumnSpan="2"
             d:IsHidden="True">
             <ContentDialog.TitleTemplate>

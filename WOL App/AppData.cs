@@ -40,11 +40,11 @@ namespace WOL_App
 		/// <returns></returns>
 		public static async Task SaveState()
 		{
-			/*if (logFile == null)
+			if (logFile == null)
 			{
-				logFile = await localFolder.CreateFileAsync("log.txt", CreationCollisionOption.ReplaceExisting);
+				logFile = await localFolder.CreateFileAsync("log.txt", CreationCollisionOption.OpenIfExists);
 				await FileIO.AppendTextAsync(logFile, "Had to create log file while storing state. Bug in startup logic?\n");
-			}*/
+			}
 			await FileIO.AppendTextAsync(logFile, "Opening storage file\n");
 			StorageFile targetsFile = await localFolder.CreateFileAsync("dataFile.txt", CreationCollisionOption.ReplaceExisting);
 			Stream stream = await targetsFile.OpenStreamForWriteAsync();
