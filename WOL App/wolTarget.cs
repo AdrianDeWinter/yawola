@@ -245,9 +245,9 @@ namespace WOL_App
 		/// </summary>
 		/// <param name="debug">Wether debug information should be printed</param>
 		/// <returns>true if the opration succeeded, false if any exceptions ocurred</returns>
-		public async Task<bool> SendMagicPacket(bool debug = false)
+		public async Task<bool> SendMagicPacket()
 		{
-			if (debug)
+			if (AppData.debug)
 			{
 				Debug.WriteLine("Sending packet:");
 				Debug.WriteLine(ToString());
@@ -260,18 +260,18 @@ namespace WOL_App
 			//obtain writer for the stream
 			DataWriter writer = new DataWriter(outStream);
 			//write the packet to the stream
-			if (debug)
+			if (AppData.debug)
 				Debug.WriteLine("writing data");
 			writer.WriteBytes(MagicPacket());
 			if (await writer.StoreAsync() == 1)
 			{
-				if (debug)
+				if (AppData.debug)
 					Debug.WriteLine("Packet sent");
 				return true;
 			}
 			else
 			{
-				if (debug)
+				if (AppData.debug)
 					Debug.WriteLine("Sending the packet failed");
 				return false;
 			}

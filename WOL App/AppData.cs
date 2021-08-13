@@ -8,12 +8,36 @@ using Windows.Storage;
 
 namespace WOL_App
 {
+	/// <summary>
+	/// Holds any data that should be shared beween classes and/or persistet across application launches. Also handles storing and restoring data.
+	/// </summary>
 	public static class AppData
 	{
+		/// <summary>
+		/// The <see cref="WolTarget"/>'s displayed in the <see cref="MainPage"/>'s <see cref="MainPage.TargetList"/>
+		/// </summary>
 		public static readonly ObservableCollection<WolTarget> targets = new ObservableCollection<WolTarget>();
+		/// <summary>
+		/// Indicates wether debug messages should be printed. Does not affect printing of exception messages
+		/// </summary>
+		public static readonly bool debug = true;
+
+		/// <summary>
+		/// reference to the app instamces local storage folder
+		/// </summary>
 		private static readonly StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+		/// <summary>
+		/// An XML Serializer for <see cref="System.Collections.ObjectModel.ObservableCollection"/>'s of <see cref="WolTarget"/>
+		/// </summary>
 		private static readonly XmlSerializer serializer = new XmlSerializer(typeof(ObservableCollection<WolTarget>));
+		/// <summary>
+		/// The log.txt file in local storage used for logging purposes
+		/// </summary>
 		private static StorageFile logFile;
+		/// <summary>
+		/// Saves the current application state to local storage
+		/// </summary>
+		/// <returns></returns>
 		public static async Task SaveState()
 		{
 			/*if (logFile == null)
@@ -29,6 +53,10 @@ namespace WOL_App
 			serializer.Serialize(stream, targets);
 			await FileIO.AppendTextAsync(logFile, "Stored " + targets.Count + " targets\n");
 		}
+		/// <summary>
+		/// Restores the application state from local storage
+		/// </summary>
+		/// <returns></returns>
 		public static async Task LoadState()
 		{
 			logFile = await localFolder.CreateFileAsync("log.txt", CreationCollisionOption.ReplaceExisting);
