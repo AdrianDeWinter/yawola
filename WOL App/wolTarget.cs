@@ -34,6 +34,11 @@ namespace WOL_App
 		/// </summary>
 		public string Mac_string { get; private set; } = "";
 		/// <summary>
+		/// The hosts mac address as a string array. Any code that wishes to work with the mac address should use the <see cref="Mac"/> memeber (and do so within the class).<br/>
+		/// If the mac address needs to be displayed, the <see cref="Mac_string"/> member should be used.
+		/// </summary>
+		public string[] Mac_string_array { get; private set; } = new string[6];
+		/// <summary>
 		/// A simple display name set by the user. Nothing fancy about this, should never be used in code since it is not cleaned in any way.
 		/// </summary>
 		public string Name { get; private set; } = "";
@@ -43,14 +48,14 @@ namespace WOL_App
 		/// If the mac address needs to be displayed, the <see cref="Mac_string"/> member should be used.
 		/// </summary>
 		/// <remarks>This member is deliberatly private, to ensure any code accessing the actual mac address of this object does so within the class, or uses the appropriate setter (<see cref="SetMac(string)"/>)</remarks>
-		private byte[] Mac { get; } = new byte[6];
+		private readonly byte[] Mac = new byte[6];
 		/// <summary>
 		/// The targets address, represented as an instance of <see cref="Windows.Networking.HostName"/>.<br/>
 		/// When working with the targets address in code, this member should bes used.<br/>
 		/// If the address needs to be displayed, the <see cref="Address"/> member should bes uesed instead.
 		/// </summary>
 		/// <remarks>This member is deliberatly private, to ensure any code accessing the actual address of this object does so within the class, or uses the appropriate setter (<see cref="SetAddress(string)"/>)</remarks>
-		private HostName HostName { get; set; } = null;
+		private HostName HostName = null;
 
 		private WolTarget() { }
 		/// <summary>
@@ -195,7 +200,10 @@ namespace WOL_App
 			//now that everything parsed successfully, set the new values
 			Mac_string = new_Mac_string;
 			for (int i = 0; i < 6; i++)
+			{
 				Mac[i] = new_mac[i];
+				Mac_string_array[i] = macSubstrings[i];
+			}
 		}
 		/// <summary>
 		/// Sets the port string on the object.
@@ -245,33 +253,33 @@ namespace WOL_App
 		/// </summary>
 		/// <param name="debug">Wether debug information should be printed</param>
 		/// <returns>true if the opration succeeded, false if any exceptions ocurred</returns>
-		public async Task<bool> SendMagicPacket(bool debug = false)
+		public async Task<bool> SendMagicPacket()
 		{
-			if (debug)
+			if (AppData.debug)
 			{
 				Debug.WriteLine("Sending packet:");
 				Debug.WriteLine(ToString());
 			}
 
 			DatagramSocket socket = new DatagramSocket();
-			//get out stream to the selected target
+			//get out stream to the selected targetf
 			IOutputStream outStream = await socket.GetOutputStreamAsync(HostName, Port);
 
 			//obtain writer for the stream
 			DataWriter writer = new DataWriter(outStream);
 			//write the packet to the stream
-			if (debug)
+			if (AppData.debug)
 				Debug.WriteLine("writing data");
 			writer.WriteBytes(MagicPacket());
-			if (await writer.StoreAsync() == 1)
+			if (await writer.StoreAsync() == 102)
 			{
-				if (debug)
+				if (AppData.debug)
 					Debug.WriteLine("Packet sent");
 				return true;
 			}
 			else
 			{
-				if (debug)
+				if (AppData.debug)
 					Debug.WriteLine("Sending the packet failed");
 				return false;
 			}
