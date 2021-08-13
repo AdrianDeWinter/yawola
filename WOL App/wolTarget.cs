@@ -4,14 +4,19 @@ using System.Diagnostics;
 using Windows.Storage.Streams;
 using Windows.Networking.Sockets;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace WOL_App
 {
-	///<summary>This class stores all information on an individual host, and provides functionality to interact with it
+
+	///<summary>This class stores all information on an individual host, and provides functionality to interact with it.
 	/// <para>It provides two, mostly identical, constructors, one accepts the mac as a colon delimited string (ie<c>12:34:56:78:9A:BC</c>),
 	/// and one that accepts an array of six, two character long, strings to represent each byte</para>
 	/// </summary>
-	public class WolTarget
+	[Serializable]
+	public class WolTarget : IXmlSerializable
 	{
 		/// <summary>
 		/// The hosts address as entered in the input field. Should only be used for display porposes,<br/>
@@ -47,6 +52,7 @@ namespace WOL_App
 		/// <remarks>This member is deliberatly private, to ensure any code accessing the actual address of this object does so within the class, or uses the appropriate setter (<see cref="SetAddress(string)"/>)</remarks>
 		private HostName HostName { get; set; } = null;
 
+		private WolTarget() { }
 		/// <summary>
 		/// Creates a new instance of wolTarget. This overload accepts the mac address in the form of a colon delimited string..<br/>
 		/// Another overload exists which takes an array of six two char long strings as the mac address: <seealso cref="WolTarget(string, string[], string, string)"/>
@@ -101,6 +107,7 @@ namespace WOL_App
 				throw e;
 			}
 		}
+
 		/// <summary>
 		/// Sets the <see cref="Address"/> and <see cref="HostName"/> members
 		/// </summary>
@@ -109,10 +116,12 @@ namespace WOL_App
 		/// <exception cref="ArgumentNullException">Thrown if null was passed to a parameter, see the exception message for more info</exception>
 		public void SetAddress(string address)
 		{
+			if (address == null)
+				throw new ArgumentNullException("The display name for a WolTarget cannot be null");
 			//evaluate the name string, throw appropriate exception if necessary
 			if (address.Length == 0)
 				throw new ArgumentException("The display name for a WolTarget cannot be empty");
-			Address = address ?? throw new ArgumentNullException("The display name for a WolTarget cannot be null");
+			Address = address;
 
 			HostName = new HostName(address);
 		}
@@ -278,6 +287,34 @@ namespace WOL_App
 		public string AddressAndPortString()
 		{
 			return Address + ":" + Port;
+		}
+
+		public XmlSchema GetSchema()
+		{
+			return null;
+		}
+
+		public void ReadXml(XmlReader reader)
+		{
+			reader.MoveToContent();
+			Name = reader.GetAttribute("name");
+			SetAddress(reader.GetAttribute("addr"));
+			SetMac(reader.GetAttribute("mac"));
+			SetPort(reader.GetAttribute("port"));
+			Boolean isEmptyElement = reader.IsEmptyElement;
+			reader.ReadStartElement();
+			if (!isEmptyElement)
+			{
+				reader.ReadEndElement();
+			}
+		}
+
+		public void WriteXml(XmlWriter writer)
+		{
+			writer.WriteAttributeString("name", Name);
+			writer.WriteAttributeString("addr", Address);
+			writer.WriteAttributeString("mac", Mac_string);
+			writer.WriteAttributeString("port", Port);
 		}
 	}
 }

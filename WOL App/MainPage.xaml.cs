@@ -3,11 +3,20 @@ using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
+using Windows.Storage;
+using System.Xml.Serialization;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace WOL_App
 {
 	public sealed partial class MainPage : Page
 	{
+		/// <summary>
+		/// Reference to the apps localStorage
+		/// </summary>
+		StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+
 		/// <summary>
 		/// Indicates wether debug messages should be printed. Does not affect printing of exception messages
 		/// </summary>
@@ -21,7 +30,7 @@ namespace WOL_App
 		/// <summary>
 		/// the list of targets dispalyed in <see cref="TargetList"/>
 		/// </summary>
-		public readonly ObservableCollection<WolTarget> targets = new ObservableCollection<WolTarget>();
+		public ObservableCollection<WolTarget> targets = new ObservableCollection<WolTarget>();
 
 		/// <summary>
 		/// The constructor called by the system when MainPage is to be displayed. Initializes the page and performs any preperation necessary
@@ -30,7 +39,8 @@ namespace WOL_App
 		{
 			this.InitializeComponent();
 			//set the listViews ItemsSource. Has to be done here because it can only be performed after both the ListView and and OberservableCollection have been initialized
-			TargetList.ItemsSource = targets;
+			//TargetList.ItemsSource = targets;
+			TargetList.ItemsSource = AppData.targets;
 			//fill the popupFields array with references to all input fields in the addHostDialog
 			popupFields[0] = clientNameInput;
 			popupFields[1] = ipInput;
@@ -41,6 +51,8 @@ namespace WOL_App
 			popupFields[6] = macInput4;
 			popupFields[7] = macInput5;
 			popupFields[8] = portInput;
+
+			//this.testXml();
 		}
 
 		/// <summary>
@@ -65,7 +77,7 @@ namespace WOL_App
 				macInput4.Text, macInput5.Text
 			};
 			WolTarget target = new WolTarget(ipInput.Text, mac, clientNameInput.Text, portInput.Text);
-			targets.Add(target);
+			AppData.targets.Add(target);
 			if (debug)
 			{
 				Debug.WriteLine("Saved target:");
@@ -82,7 +94,7 @@ namespace WOL_App
 		/// <param name="e"></param>
 		private void Delete_Button_Click(object sender, RoutedEventArgs e)
 		{
-			_ = targets.Remove((WolTarget)TargetList.SelectedItem);
+			_ = AppData.targets.Remove((WolTarget)TargetList.SelectedItem);
 		}
 
 		/// <summary>
@@ -158,6 +170,23 @@ namespace WOL_App
 		private void TargetList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			SendButton.IsEnabled = TargetList.SelectedItem != null;
+		}
+
+		private async void testXml()
+		{
+			XmlSerializer serializer = new XmlSerializer(typeof(ObservableCollection<WolTarget>));
+			ObservableCollection<WolTarget> temp = new ObservableCollection<WolTarget>
+			{
+				new WolTarget("bla", "0:0:0:0:0:0", "blub", "1")
+			};
+			StorageFile sampleFile = await localFolder.CreateFileAsync("dataFile.txt", CreationCollisionOption.ReplaceExisting);
+			Stream stream = await sampleFile.OpenStreamForWriteAsync();
+			// Serialize the object, and close the TextWriter.
+			serializer.Serialize(stream, temp);
+			stream.Close();
+			Stream reader = await sampleFile.OpenStreamForReadAsync();
+			foreach (WolTarget t in (ObservableCollection<WolTarget>)serializer.Deserialize(reader))
+				targets.Add(t);
 		}
 	}
 }
