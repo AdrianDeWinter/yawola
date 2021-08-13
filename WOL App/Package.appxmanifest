@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="34af3157-1c77-476d-b66e-065ffcb24d34"
-    Publisher="CN=marti"
-    Version="1.0.0.0" />
+    Name="yawola"
+    Publisher="CN=Martin Blecker"
+    Version="1.0.5.0" />
 
   <mp:PhoneIdentity PhoneProductId="34af3157-1c77-476d-b66e-065ffcb24d34" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>WOL App</DisplayName>
-    <PublisherDisplayName>marti</PublisherDisplayName>
+    <DisplayName>yawola WOL App</DisplayName>
+    <PublisherDisplayName>Martin Blecker</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -32,13 +32,18 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="WOL_App.App">
       <uap:VisualElements
-        DisplayName="WOL App"
+        DisplayName="YaWOLA"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="WOL App"
+        Description="yawola (Yet another WakeOnLan App) A small UWP WakeOnLan app"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/>
+          <uap:Rotation Preference="portrait"/>
+          <uap:Rotation Preference="landscapeFlipped"/>
+          <uap:Rotation Preference="portraitFlipped"/></uap:InitialRotationPreference>
       </uap:VisualElements>
     </Application>
   </Applications>
