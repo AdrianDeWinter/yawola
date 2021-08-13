@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using WOL_App;
+
 namespace UnitTests
 {
     [TestClass]
@@ -58,35 +58,38 @@ namespace UnitTests
     [TestClass]
     public class Test_WolTarget_Constructors
     {
+        private static readonly string[] macElements = { "a1", "f5", "", "17", "a", "9" };
+        private static readonly string[] macElementsPadded = { "a1", "f5", "00", "17", "0a", "09" };
+        private static readonly string macString = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", macElements[0], macElements[1], macElements[2], macElements[3], macElements[4], macElements[5]);
+        private static readonly string macStringPadded = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", macElementsPadded[0], macElementsPadded[1], macElementsPadded[2], macElementsPadded[3], macElementsPadded[4], macElementsPadded[5]);
+        private static WolTarget tMacString;
+        private static WolTarget tMacArray;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            tMacString = new WolTarget("addr", macString, "name", "1");
+            tMacArray = new WolTarget("addr", macElements, "name", "1");
+        }
+
         [TestMethod]
         public void Test_Constructor_MacString()
         {
-            string[] macElements = { "a1", "f5", "", "17", "a", "9" };
-            string[] macElementsPadded = { "a1", "f5", "00", "17", "0a", "09" };
-            string macString = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", macElements[0], macElements[1], macElements[2], macElements[3], macElements[4], macElements[5]);
-            string macStringPadded = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", macElementsPadded[0], macElementsPadded[1], macElementsPadded[2], macElementsPadded[3], macElementsPadded[4], macElementsPadded[5]);
-            WolTarget t = new WolTarget("addr", macString, "name", "1");
-            Assert.AreEqual(macStringPadded, t.Mac_string, "Mac_string did not match expected value");
-            CollectionAssert.AreEqual(macElementsPadded, t.Mac_string_array, "Mac_string_array did not match expected value");
+            Assert.AreEqual(macStringPadded, tMacString.Mac_string, "Mac_string did not match expected value");
+            CollectionAssert.AreEqual(macElementsPadded, tMacString.Mac_string_array, "Mac_string_array did not match expected value");
         }
+
         [TestMethod]
         public void Test_Constructor_MacStringArray()
         {
-            string[] macElements = { "a1", "f5", "", "17", "a", "9" };
-            string[] macElementsPadded = { "a1", "f5", "00", "17", "0a", "09" };
-            string macStringPadded = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", macElementsPadded[0], macElementsPadded[1], macElementsPadded[2], macElementsPadded[3], macElementsPadded[4], macElementsPadded[5]);
-            WolTarget t = new WolTarget("addr", macElements, "name", "1");
-            Assert.AreEqual(macStringPadded, t.Mac_string, "Mac_string did not match expected value");
-            CollectionAssert.AreEqual(macElements, t.Mac_string_array, "Mac_string_array did not match expected value");
+            Assert.AreEqual(macStringPadded, tMacArray.Mac_string, "Mac_string did not match expected value");
+            CollectionAssert.AreEqual(macElements, tMacArray.Mac_string_array, "Mac_string_array did not match expected value");
         }
+
         [TestMethod]
         public void Test_Constructor_EqualResults()
         {
-            string[] macElements = { "a1", "f5", "", "17", "a", "9" };
-            string macString = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", macElements[0], macElements[1], macElements[2], macElements[3], macElements[4], macElements[5]);
-            WolTarget t1 = new WolTarget("addr", macElements, "name", "1");
-            WolTarget t2 = new WolTarget("addr", macString, "name", "1");
-            Assert.AreEqual(t1, t2, "The two constructors of WolTarget did not return equal results");
+            Assert.AreEqual(tMacArray, tMacString, "The two constructors of WolTarget did not return equal results");
         }
     }
 }

@@ -8,10 +8,10 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace WOL_App
 {
-
 	///<summary>This class stores all information on an individual host, and provides functionality to interact with it.
 	/// <para>It provides two, mostly identical, constructors, one accepts the mac as a colon delimited string (ie<c>12:34:56:78:9A:BC</c>),
 	/// and one that accepts an array of six, two character long, strings to represent each byte</para>
@@ -164,7 +164,6 @@ namespace WOL_App
 		{
 			if (macSubstrings.Length != 6)
 				throw new ArgumentException("The input array must have exactly six elements");
-			string new_Mac_string = "";
 			byte[] new_mac = new byte[6];
 			//parse the mac's byte strings into a bytes in an array
 			for (int i = 0; i < 6; i++)
@@ -192,8 +191,8 @@ namespace WOL_App
 				}
 			}
 			//build new, padded, mac_string
-			new_Mac_string = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", macSubstrings[0], macSubstrings[1], macSubstrings[2], macSubstrings[3], macSubstrings[4], macSubstrings[5]);
-			
+			string new_Mac_string = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", macSubstrings[0], macSubstrings[1], macSubstrings[2], macSubstrings[3], macSubstrings[4], macSubstrings[5]);
+
 			//now that everything parsed successfully, set the new values
 			Mac_string = new_Mac_string;
 
@@ -299,12 +298,12 @@ namespace WOL_App
 
 		public void ReadXml(XmlReader reader)
 		{
-			reader.MoveToContent();
+			_ = reader.MoveToContent();
 			Name = reader.GetAttribute("name");
 			SetAddress(reader.GetAttribute("addr"));
 			SetMac(reader.GetAttribute("mac"));
 			SetPort(reader.GetAttribute("port"));
-			Boolean isEmptyElement = reader.IsEmptyElement;
+			bool isEmptyElement = reader.IsEmptyElement;
 			reader.ReadStartElement();
 			if (!isEmptyElement)
 			{
@@ -345,6 +344,22 @@ namespace WOL_App
 				return false;
 			//if all were equal, return true
 			return true;
+		}
+		/// <summary>
+		/// Auto-generated GetHashCode method.
+		/// </summary>
+		/// <returns>A hash code for the current WolTarget object</returns>
+		public override int GetHashCode()
+		{
+			int hashCode = -1060869375;
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Address);
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Port);
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Mac_string);
+			hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(Mac_string_array);
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+			hashCode = hashCode * -1521134295 + EqualityComparer<byte[]>.Default.GetHashCode(Mac);
+			hashCode = hashCode * -1521134295 + EqualityComparer<HostName>.Default.GetHashCode(HostName);
+			return hashCode;
 		}
 	}
 }
