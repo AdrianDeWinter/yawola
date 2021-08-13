@@ -9,7 +9,7 @@
   <Identity
     Name="yawola"
     Publisher="CN=Martin Blecker"
-    Version="1.0.5.0" />
+    Version="0.1.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="34af3157-1c77-476d-b66e-065ffcb24d34" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
