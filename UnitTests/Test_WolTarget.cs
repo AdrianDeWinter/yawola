@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using WOL_App;
 
 namespace UnitTests
@@ -90,6 +91,84 @@ namespace UnitTests
         public void Test_Constructor_EqualResults()
         {
             Assert.AreEqual(tMacArray, tMacString, "The two constructors of WolTarget did not return equal results");
+        }
+    }
+    [TestClass]
+    public class Test_WolTarget_AddressAndPortString
+    {
+        private static WolTarget t;
+        private static readonly string addr = "addr.de";
+        private static readonly string port = "1";
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            t = new WolTarget(addr, ":::::", "name", port);
+        }
+
+        [TestMethod]
+        public void Test_AddressAndPortString()
+        {
+            Assert.AreEqual(addr + ":" + port, t.AddressAndPortString(), "AddressAndPortString returned an incorrect string");
+        }
+    }
+
+    [TestClass]
+    public class Test_WolTarget_SetPort
+    {
+        private static WolTarget t;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            t = new WolTarget("addr", ":::::", "name", "1");
+        }
+
+        [TestMethod]
+        public void Test_SetPort()
+        {
+            string newPort = "2";
+            t.SetPort(newPort);
+            Assert.AreEqual(newPort, t.Port, "SetPort failed to set the new port information");
+        }
+
+        [TestMethod]
+        public void Test_SetPort_EmptyString()
+        {
+            string newPort = "";
+            t.SetPort(newPort);
+            Assert.AreEqual("9999", t.Port, "SetPort did not default to port 9999 when given an empty string");
+        }
+
+        [TestMethod]
+        public void Test_SetPort_NoString()
+        {
+            t.SetPort();
+            Assert.AreEqual("9999", t.Port, "SetPort did not default to port 9999 when given no string");
+        }
+
+        [TestMethod]
+        public void Test_SetPort_NullString()
+        {
+            _ = Assert.ThrowsException<ArgumentNullException>(delegate () { t.SetPort(null); }, "SetPort did not throw an ArgumentNullException when given a null value");
+        }
+
+        [TestMethod]
+        public void Test_SetPort_ValueOverflow()
+        {
+            _ = Assert.ThrowsException<OverflowException>(delegate () { t.SetPort(int.MaxValue.ToString()); }, "SetPort did not throw an OverflowException when given a value greater than the max possible port number");
+        }
+
+        [TestMethod]
+        public void Test_SetPort_IncorrectFormat_decimal()
+        {
+            _ = Assert.ThrowsException<FormatException>(delegate () { t.SetPort("1.2"); }, "SetPort did not throw a FormatException when given a decimal value");
+        }
+
+        [TestMethod]
+        public void Test_SetPort_IncorrectFormat_letters()
+        {
+            _ = Assert.ThrowsException<FormatException>(delegate () { t.SetPort("1f"); }, "SetPort did not throw a FormatException when given a string containing lettters");
         }
     }
 }

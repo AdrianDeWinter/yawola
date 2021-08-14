@@ -206,8 +206,11 @@ namespace WOL_App
 		/// <exception cref="ArgumentNullException">Thrown if the string was null</exception>
 		/// <exception cref="FormatException">Thrown if the string was not of the correct format.</exception>
 		/// <exception cref="OverflowException">Thrown if a part of the string represents a number less than 0 or greater than 65535.</exception>
-		public void SetPort(string port)
+		public void SetPort(string port = "")
 		{
+			//default to port 9999 if an empty string was passed
+			if (port == null)
+				throw new ArgumentNullException("SetPort does not accept null as an input");
 			if (port.Length == 0)
 				Port = "9999";
 			else
