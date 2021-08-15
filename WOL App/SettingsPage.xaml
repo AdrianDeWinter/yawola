@@ -23,7 +23,7 @@
         Click="CloseSettingsButton_Click">
             <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8BB;"/>
         </Button>
-        <muxc:RadioButtons Header="Data Storage Location" Name="SettingsStorageLocationRadio">
+        <muxc:RadioButtons Header="Data Storage Location">
             <RadioButton Content="Both" IsChecked="true" Checked="SettingsStorageLocationChanged"/>
             <RadioButton Content="Roaming" Checked="SettingsStorageLocationChanged"/>
             <RadioButton Content="Local" Checked="SettingsStorageLocationChanged"/>

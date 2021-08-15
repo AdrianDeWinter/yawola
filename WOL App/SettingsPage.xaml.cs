@@ -34,7 +34,7 @@ namespace WOL_App
 
 		private void SettingsStorageLocationChanged(object sender, RoutedEventArgs e)
 		{
-
+			return;
 		}
 	}
 }
