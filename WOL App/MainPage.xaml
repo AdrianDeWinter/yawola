@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="WOL_App.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,45 +8,72 @@
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="350" Height="350">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="490" Height="350">
 
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition Width="70"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="42"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <ListView x:Name="TargetList" BorderThickness="2"
                   BorderBrush="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                  HorizontalAlignment="Left" Margin="5,5,5,5"
-                  Width="270" SelectionChanged="TargetList_SelectionChanged"
-                  SelectionMode="Single" IsItemClickEnabled="False"
-                  Grid.RowSpan="2" Grid.Column="0">
+                  Background="#EEEEEE"
+                  HorizontalAlignment="Stretch" Margin="5,0,5,5"
+                  SelectionMode="Single" IsItemClickEnabled="True"
+                  Grid.Row="1" ItemClick="TargetList_ItemClick"
+                  RightTapped="TargetList_RightTapped">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:WolTarget">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="{x:Bind Name}" x:Phase="1" FontSize="18" FontWeight="Bold" Margin="0,5,0,0"/>
-                        <TextBlock Text="{x:Bind AddressAndPortString()}" Margin="0,0,0,0"/>
-                        <TextBlock Text="{x:Bind Mac_string}" Margin="0,0,0,5"/>
-                    </StackPanel>
+                    <Grid>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{x:Bind Name}" FontSize="18" FontWeight="Bold"/>
+                            <TextBlock Text="{x:Bind AddressAndPortString()}"/>
+                            <TextBlock Text="{x:Bind Mac_string}"/>
+                        </StackPanel>
+                        <SymbolIcon Symbol="Send" HorizontalAlignment="Right"/>
+                    </Grid>
                 </DataTemplate>
-            </ListView.ItemTemplate>
+                </ListView.ItemTemplate>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.Resources>
+                <MenuFlyout x:Name="targetContextFlyout">
+                    <MenuFlyout.Items>
+                        <MenuFlyoutItem x:Name="Edit" Text="Edit" Click="Edit_Button_Click" Icon="Edit">
+                            <MenuFlyoutItem.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="Enter"/>
+                            </MenuFlyoutItem.KeyboardAccelerators>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem x:Name="Remove" Text="Remove" Click="Delete_Button_Click" Icon="Delete">
+                            <MenuFlyoutItem.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="Delete"/>
+                            </MenuFlyoutItem.KeyboardAccelerators>
+                        </MenuFlyoutItem>
+                    </MenuFlyout.Items>
+                </MenuFlyout>
+            </ListView.Resources>
         </ListView>
-        <Button Name="AddButton" Content="Add" Click="Open_Add_Dialog"
-                VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
-                HorizontalAlignment="Stretch"/>
-        <Button Name="SendButton" Content="Send" Click="Send_Button_Click"
-                Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
-                HorizontalAlignment="Stretch" IsEnabled="false"/>
-        <Button Name="EditButton" Content="Edit" Click="Edit_Button_Click"
-                VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="1" Margin="5,5,5,42"
-                HorizontalAlignment="Stretch" IsEnabled="false"/>
-        <Button Name="DeleteButton" Content="Delete" Click="Delete_Button_Click"
-                VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="1" Margin="5,5,5,5"
-                HorizontalAlignment="Stretch"/>
-        <!-- This content dialogs visibility is set to hidden to make the app itself visible in the editor -->
+
+        <Button Name="AddButton" Click="Open_Add_Dialog"
+                VerticalAlignment="Top" Grid.Row="0" Margin="5,5,5,5"
+                HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal">
+                <SymbolIcon Symbol="Add" Margin="0,0,5,0"/>
+                <TextBlock Text="Add new host"></TextBlock>
+            </StackPanel>
+        </Button>
+        <Button Name="SettingsButton" Click="SettingsButton_Click"
+            VerticalAlignment="Top" Grid.Row="0" Margin="5,5,5,5"
+            HorizontalAlignment="Right">
+            <SymbolIcon Symbol="Setting"/>
+        </Button>
+        
         <ContentDialog
             Width="Auto"
             Margin="10,10,10,10"
@@ -71,7 +98,7 @@
                 <TextBox Name="clientNameInput" InputScope="Text" HorizontalAlignment="Stretch" PlaceholderText="Name" TextWrapping="NoWrap" TextChanged="ValidateAddHostForm"/>
                 <TextBox Name="ipInput" InputScope="AlphanumericFullWidth" HorizontalAlignment="Stretch" PlaceholderText="IP/Hostname" TextChanged="ValidateAddHostForm"/>
                 <controls:DockPanel x:Name="macInputStack" Width="Auto">
-                    <TextBox Name="macInput0" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin" ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm" Text=""/>
+                    <TextBox Name="macInput0" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin" ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
                     <TextBox Name="macInput1" TextAlignment="Center" Width="Auto" InputScope="AlphanumericPin"  ui:TextBoxExtensions.ValidationMode="Dynamic" ui:TextBoxExtensions.ValidationType="Custom" ui:TextBoxExtensions.Regex="[0-9a-fA-F]" MaxLength="2" TextChanged="ValidateAddHostForm"/>
                     <TextBlock FontWeight="ExtraBold" FontSize="19">:</TextBlock>
