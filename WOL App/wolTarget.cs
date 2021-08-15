@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace WOL_App
 {
-
 	///<summary>This class stores all information on an individual host, and provides functionality to interact with it.
 	/// <para>It provides two, mostly identical, constructors, one accepts the mac as a colon delimited string (ie<c>12:34:56:78:9A:BC</c>),
 	/// and one that accepts an array of six, two character long, strings to represent each byte</para>
@@ -48,7 +49,7 @@ namespace WOL_App
 		/// If the mac address needs to be displayed, the <see cref="Mac_string"/> member should be used.
 		/// </summary>
 		/// <remarks>This member is deliberatly private, to ensure any code accessing the actual mac address of this object does so within the class, or uses the appropriate setter (<see cref="SetMac(string)"/>)</remarks>
-		private readonly byte[] Mac = new byte[6];
+		private byte[] Mac = new byte[6];
 		/// <summary>
 		/// The targets address, represented as an instance of <see cref="Windows.Networking.HostName"/>.<br/>
 		/// When working with the targets address in code, this member should bes used.<br/>
@@ -140,7 +141,6 @@ namespace WOL_App
 		/// <exception cref="OverflowException">Thrown if a part of the string represents a number less than MinValue or greater than MaxValue or includes non-zero, fractional digits.</exception>
 		public void SetMac(string mac)
 		{
-			Mac_string = mac;
 			//split the mc address string into its byte strings
 			string[] macArray = mac.Split(':');
 			try
@@ -164,7 +164,6 @@ namespace WOL_App
 		{
 			if (macSubstrings.Length != 6)
 				throw new ArgumentException("The input array must have exactly six elements");
-			string new_Mac_string = "";
 			byte[] new_mac = new byte[6];
 			//parse the mac's byte strings into a bytes in an array
 			for (int i = 0; i < 6; i++)
@@ -174,8 +173,7 @@ namespace WOL_App
 				{
 					//if a single digit was entered into this field, pad with a zero
 					if (macSubstrings[i].Length < 2)
-						new_Mac_string += "0";
-					new_Mac_string += macSubstrings[i];
+						macSubstrings[i] = "0" + macSubstrings[i];
 					try
 					{
 						new_mac[i] = byte.Parse(macSubstrings[i], System.Globalization.NumberStyles.HexNumber);
@@ -188,22 +186,18 @@ namespace WOL_App
 				//if nothing was entered, default to "00"
 				else
 				{
-					new_Mac_string += "00";
+					macSubstrings[i] = "00";
 					new_mac[i] = 0;
 				}
-
-				//also add colons to the mac string as it is being built (except after the last byte)
-				if (i < 5)
-					new_Mac_string += ":";
 			}
+			//build new, padded, mac_string
+			string new_Mac_string = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", macSubstrings[0], macSubstrings[1], macSubstrings[2], macSubstrings[3], macSubstrings[4], macSubstrings[5]);
 
 			//now that everything parsed successfully, set the new values
 			Mac_string = new_Mac_string;
-			for (int i = 0; i < 6; i++)
-			{
-				Mac[i] = new_mac[i];
-				Mac_string_array[i] = macSubstrings[i];
-			}
+
+			Mac = new_mac;
+			Mac_string_array = macSubstrings;
 		}
 		/// <summary>
 		/// Sets the port string on the object.
@@ -212,8 +206,11 @@ namespace WOL_App
 		/// <exception cref="ArgumentNullException">Thrown if the string was null</exception>
 		/// <exception cref="FormatException">Thrown if the string was not of the correct format.</exception>
 		/// <exception cref="OverflowException">Thrown if a part of the string represents a number less than 0 or greater than 65535.</exception>
-		public void SetPort(string port)
+		public void SetPort(string port = "")
 		{
+			//default to port 9999 if an empty string was passed
+			if (port == null)
+				throw new ArgumentNullException("SetPort does not accept null as an input");
 			if (port.Length == 0)
 				Port = "9999";
 			else
@@ -290,7 +287,7 @@ namespace WOL_App
 		/// <returns>A strign representation of this host</returns>
 		public override string ToString()
 		{
-			return "Display Name: " + Name + "\nAddress: " + Address + "\nMAC: " + Mac_string + "\nPort: " + Port;
+			return string.Format("Display Name: {0}\nAddress: {1}\nMAC: {2}\nPort: {3}", Name, Address, Mac_string, Port);
 		}
 		public string AddressAndPortString()
 		{
@@ -304,12 +301,12 @@ namespace WOL_App
 
 		public void ReadXml(XmlReader reader)
 		{
-			reader.MoveToContent();
+			_ = reader.MoveToContent();
 			Name = reader.GetAttribute("name");
 			SetAddress(reader.GetAttribute("addr"));
 			SetMac(reader.GetAttribute("mac"));
 			SetPort(reader.GetAttribute("port"));
-			Boolean isEmptyElement = reader.IsEmptyElement;
+			bool isEmptyElement = reader.IsEmptyElement;
 			reader.ReadStartElement();
 			if (!isEmptyElement)
 			{
@@ -323,6 +320,49 @@ namespace WOL_App
 			writer.WriteAttributeString("addr", Address);
 			writer.WriteAttributeString("mac", Mac_string);
 			writer.WriteAttributeString("port", Port);
+		}
+		/// <summary>
+		/// Determines whether the specified WolTarget object has an equivalent value to the current WolTarget object.
+		/// </summary>
+		/// <param name="obj">A WolTarget object that is compared with the current WolTarget.</param>
+		/// <returns>A Boolean value that indicates whether the specified WolTarget object is equal to the current WolTarget object.</returns>
+		public override bool Equals(object obj)
+		{
+			//catch null refs and type mismatches
+			if ((obj == null) || !GetType().Equals(obj.GetType()))
+				return false;
+			WolTarget wolTarget = (WolTarget)obj;
+
+			//test name
+			if (!Name.Equals(wolTarget.Name))
+				return false;
+			//test address and hostname
+			if (!(Address.Equals(wolTarget.Address) && HostName.IsEqual(wolTarget.HostName)))
+				return false;
+			//test mac, mac_string and mac_string_array
+			if (!(Mac_string.Equals(wolTarget.Mac_string) && Enumerable.SequenceEqual(Mac_string_array, wolTarget.Mac_string_array) && Enumerable.SequenceEqual(Mac, wolTarget.Mac)))
+				return false;
+			//test port
+			if (!Port.Equals(wolTarget.Port))
+				return false;
+			//if all were equal, return true
+			return true;
+		}
+		/// <summary>
+		/// Auto-generated GetHashCode method.
+		/// </summary>
+		/// <returns>A hash code for the current WolTarget object</returns>
+		public override int GetHashCode()
+		{
+			int hashCode = -1060869375;
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Address);
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Port);
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Mac_string);
+			hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(Mac_string_array);
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+			hashCode = hashCode * -1521134295 + EqualityComparer<byte[]>.Default.GetHashCode(Mac);
+			hashCode = hashCode * -1521134295 + EqualityComparer<HostName>.Default.GetHashCode(HostName);
+			return hashCode;
 		}
 	}
 }

@@ -17,6 +17,8 @@ namespace WOL_App
 		private readonly TextBox[] popupFields = new TextBox[9];
 
 		private bool editing = false;
+
+		private static WolTarget selectedItem;
 		/// <summary>
 		/// The constructor called by the system when MainPage is to be displayed. Initializes the page and performs any preperation necessary
 		/// </summary>
@@ -35,17 +37,6 @@ namespace WOL_App
 			popupFields[6] = macInput4;
 			popupFields[7] = macInput5;
 			popupFields[8] = portInput;
-		}
-
-		/// <summary>
-		/// Callbck for the "Send" button, retrieves the selected item from <see cref="TargetList"/> and orders a magic packet to be sent 
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void Send_Button_Click(object sender, RoutedEventArgs e)
-		{
-			WolTarget target = (WolTarget)TargetList.SelectedItem;
-			_ = target.SendMagicPacket();
 		}
 
 		/// <summary>
@@ -202,14 +193,43 @@ namespace WOL_App
 		}
 
 		/// <summary>
-		/// Event handler for the SelectionChanged event on the <see cref="TargetList"/>. Updates the <see cref="SendButton"/>'s IsEnabled property
+		/// Button callback to navigate to the settings page
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void TargetList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void SettingsButton_Click(object sender, RoutedEventArgs e)
 		{
-			SendButton.IsEnabled = TargetList.SelectedItem != null;
-			EditButton.IsEnabled = TargetList.SelectedItem != null;
+			this.Frame.Navigate(typeof(SettingsPage));
+		}
+
+		/// <summary>
+		/// Callbck for the <see cref="TargetList"/>'s ItemClicked event, orders the selected <see cref="WolTarget"/> to send a magic packet
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void TargetList_ItemClick(object sender, ItemClickEventArgs e)
+		{
+			_ = ((WolTarget)e.ClickedItem).SendMagicPacket();
+		}
+
+		private void TargetList_RightTapped(object sender, Windows.UI.Xaml.Input.RightTappedRoutedEventArgs e)
+		{
+			ListView listView = (ListView)sender;
+			targetContextFlyout.ShowAt(listView, e.GetPosition(listView));
+
+			WolTarget selectedItem = ((FrameworkElement)e.OriginalSource).DataContext as WolTarget;
+			
+			//if the user used right click to open the context menu, set selection to that item
+			if (selectedItem != null)
+				TargetList.SelectedIndex = AppData.targets.IndexOf(selectedItem);
+			//if the keyboard context menu button was used, e.OriginalSource.DataKontext will be null. In that case, TargetList.selectedItem will be set and can be used instead
+			else
+			{
+				//if selectedIndex is -1, the user has only navigated to the list and auto highlighted the first entry.
+				//Selection would only happen once the user has navigated up or down inside the list. Thus we set the selectedIndex to 0
+				if (TargetList.SelectedIndex == -1)
+					TargetList.SelectedIndex = 0;
+			}
 		}
 	}
 }

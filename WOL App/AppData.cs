@@ -22,6 +22,8 @@ namespace WOL_App
 		/// </summary>
 		public static readonly bool debug = true;
 
+		public static readonly string logFileName = "log.txt";
+		public static readonly string hostsFileName = "dataFile.txt";
 		/// <summary>
 		/// reference to the app instamces local storage folder
 		/// </summary>
@@ -42,15 +44,23 @@ namespace WOL_App
 		{
 			if (logFile == null)
 			{
-				logFile = await localFolder.CreateFileAsync("log.txt", CreationCollisionOption.OpenIfExists);
+				logFile = await localFolder.CreateFileAsync(logFileName, CreationCollisionOption.OpenIfExists);
+				Debug.WriteLine("Had to create log file while storing state. Bug in startup logic?\n");
 				await FileIO.AppendTextAsync(logFile, "Had to create log file while storing state. Bug in startup logic?\n");
 			}
+			logFile = await localFolder.CreateFileAsync(logFileName, CreationCollisionOption.OpenIfExists);
+
 			await FileIO.AppendTextAsync(logFile, "Opening storage file\n");
-			StorageFile targetsFile = await localFolder.CreateFileAsync("dataFile.txt", CreationCollisionOption.ReplaceExisting);
+			Debug.WriteLine("Opening storage file\n");
+			StorageFile targetsFile = await localFolder.CreateFileAsync(hostsFileName, CreationCollisionOption.ReplaceExisting);
 			Stream stream = await targetsFile.OpenStreamForWriteAsync();
+
 			Debug.WriteLine("Writing to " + targetsFile.Path);
+			await FileIO.AppendTextAsync(logFile, "Writing to " + targetsFile.Path);
+
 			// Serialize the object, and close the TextWriter.
 			serializer.Serialize(stream, targets);
+			Debug.WriteLine("Stored " + targets.Count + " targets\n");
 			await FileIO.AppendTextAsync(logFile, "Stored " + targets.Count + " targets\n");
 		}
 		/// <summary>
@@ -59,9 +69,19 @@ namespace WOL_App
 		/// <returns></returns>
 		public static async Task LoadState()
 		{
-			logFile = await localFolder.CreateFileAsync("log.txt", CreationCollisionOption.ReplaceExisting);
-			await FileIO.AppendTextAsync(logFile,"Begin reading targets file\n");
-			StorageFile targetsFile = await localFolder.GetFileAsync("dataFile.txt");
+			logFile = await localFolder.CreateFileAsync(logFileName, CreationCollisionOption.ReplaceExisting);
+			await FileIO.AppendTextAsync(logFile, "Begin reading targets file\n");
+			StorageFile targetsFile;
+			try
+			{
+				targetsFile = await localFolder.GetFileAsync(hostsFileName);
+			}
+			catch (Exception e)
+			{
+				Debug.WriteLine("Reading known hosts file failed: " + e.Message);
+				await FileIO.AppendTextAsync(logFile, "Reading known hosts file failed: " + e.Message + "\n");
+				return;
+			}
 			Stream reader = await targetsFile.OpenStreamForReadAsync();
 			Debug.WriteLine("Reading from " + targetsFile.Path);
 			try
