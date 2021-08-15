@@ -12,9 +12,11 @@ Existing Features:
    - local network host name
    - URL
  - Add hosts via a nice little content dialog
+ - Hosts are automatically saved to localstorage
+ - Support x86, x64, ARM and ARM64
 
 Planned features:
- - save added hosts persistenly. localStorage is easy, roaming storage would be ideal but has a deprecation warning for future releases. Suggestions are very welcome on this one
+ - add option to use roaming storage. Configurable via settings page
  - make the number of attempts configurable
  - detect if the host was woken successfully? sadly, ping is not available to uwp applications, so this one is not quite straight forward
  - add an api to be called by other apps?

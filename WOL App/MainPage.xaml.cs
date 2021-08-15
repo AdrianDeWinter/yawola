@@ -18,7 +18,6 @@ namespace WOL_App
 
 		private bool editing = false;
 
-		private static WolTarget selectedItem;
 		/// <summary>
 		/// The constructor called by the system when MainPage is to be displayed. Initializes the page and performs any preperation necessary
 		/// </summary>
