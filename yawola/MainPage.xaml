@@ -87,8 +87,8 @@
             CloseButtonClick="AddHostDialog_CloseButtonClick"
             DefaultButton="Primary"
             Opened="ValidateAddHostForm"
-            Grid.ColumnSpan="2"
-            d:IsHidden="True">
+            Grid.RowSpan="2"
+            HorizontalAlignment="Stretch">
             <ContentDialog.TitleTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -96,7 +96,7 @@
                     </StackPanel>
                 </DataTemplate>
             </ContentDialog.TitleTemplate>
-            <StackPanel Orientation="Vertical" Width="Auto">
+            <StackPanel Orientation="Vertical">
                 <TextBox Name="clientNameInput" InputScope="Text" HorizontalAlignment="Stretch" PlaceholderText="Name" TextWrapping="NoWrap" TextChanged="ValidateAddHostForm"/>
                 <TextBox Name="ipInput" InputScope="AlphanumericFullWidth" HorizontalAlignment="Stretch" PlaceholderText="IP/Hostname" TextChanged="ValidateAddHostForm"/>
                 <controls:DockPanel x:Name="macInputStack" Width="Auto">
