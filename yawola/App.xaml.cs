@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -55,6 +56,8 @@ namespace yawola
 
 				if (e.PreviousExecutionState == ApplicationExecutionState.Terminated || e.PreviousExecutionState == ApplicationExecutionState.ClosedByUser)
 				{
+					if (AppData.debug)
+						Debug.WriteLine("Loading last state from disk");
 					await AppData.LoadState();
 				}
 

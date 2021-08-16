@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:system="clr-namespace:yawola"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="490" Height="350">
 
@@ -24,19 +25,23 @@
                   HorizontalAlignment="Stretch" Margin="5,0,5,5"
                   SelectionMode="Single" IsItemClickEnabled="True"
                   Grid.Row="1" ItemClick="TargetList_ItemClick"
-                  RightTapped="TargetList_RightTapped">
+                  RightTapped="TargetList_RightTapped"
+                  ItemsSource="{x:Bind local:AppData.targets}">
+            <d:ListView.Items>
+                <local:WolTarget Name="testitem" Port="11" Address="localhost" Mac_string="10:11:12:13:14:15"></local:WolTarget>
+            </d:ListView.Items>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:WolTarget">
                     <Grid>
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{x:Bind Name}" FontSize="18" FontWeight="Bold"/>
-                            <TextBlock Text="{x:Bind AddressAndPortString()}"/>
-                            <TextBlock Text="{x:Bind Mac_string}"/>
+                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
+                            <TextBlock Text="{x:Bind AddressAndPortString(), Mode=OneWay}"/>
+                            <TextBlock Text="{x:Bind Mac_string, Mode=OneWay}"/>
                         </StackPanel>
                         <SymbolIcon Symbol="Send" HorizontalAlignment="Right"/>
                     </Grid>
                 </DataTemplate>
-                </ListView.ItemTemplate>
+            </ListView.ItemTemplate>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

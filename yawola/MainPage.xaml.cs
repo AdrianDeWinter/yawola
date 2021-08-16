@@ -24,8 +24,6 @@ namespace yawola
 		public MainPage()
 		{
 			this.InitializeComponent();
-			//set the listViews ItemsSource. Has to be done here because it can only be performed after both the ListView and and OberservableCollection have been initialized
-			TargetList.ItemsSource = AppData.targets;
 			//fill the popupFields array with references to all input fields in the addHostDialog
 			popupFields[0] = clientNameInput;
 			popupFields[1] = ipInput;
@@ -60,14 +58,36 @@ namespace yawola
 		/// </summary>
 		private void UpdateHost()
 		{
-			WolTarget target = CreateHostObject();
-			WolTarget old = (WolTarget)TargetList.SelectedItem;
-			int index = AppData.targets.IndexOf(old);
+			WolTarget target = (WolTarget)TargetList.SelectedItem;
+			//create copy of old WolTarget objet to roll back to in case something goes wrong
+			WolTarget old = new WolTarget(target);
+			int index = AppData.targets.IndexOf(target);
 			if (AppData.debug)
 				Debug.WriteLine("Saving entry no " + index);
-			_ = AppData.targets.Remove(old);
-			AppData.targets.Insert(index, target);
-			TargetList.SelectedIndex = index;
+			//update entry in a try block so changes can be rolled back in the catch block if something goes wrong
+			try
+			{
+				target.SetAddress(ipInput.Text);
+				string[] mac = {
+				macInput0.Text, macInput1.Text ,
+				macInput2.Text, macInput3.Text ,
+				macInput4.Text, macInput5.Text
+				};
+				target.SetMac(mac);
+				target.SetPort(portInput.Text);
+				target.Name = clientNameInput.Text;
+
+			}
+			catch (Exception e)
+			{
+				Debug.WriteLine("Exception ocurred while updating targetList entry. Rolling back...");
+				Debug.WriteLine(e.Message);
+				_ = AppData.targets.Remove(target);
+				AppData.targets.Insert(index, target);
+				TargetList.SelectedIndex = index;
+				return;
+			}
+
 			if (AppData.debug)
 			{
 				Debug.WriteLine("Saved target:");
