@@ -3,14 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WOL App", "WOL App.csproj", "{EB1D76D5-5AC1-4C1A-9200-F1ACA285F28B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yawola", "yawola\yawola.csproj", "{EB1D76D5-5AC1-4C1A-9200-F1ACA285F28B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8023FF35-2BDD-4916-A18A-9C1C08D2B054}"
 	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
+		yawola\.editorconfig = yawola\.editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestsProject", "..\UnitTests\UnitTestsProject.csproj", "{03696995-4C60-400C-A6ED-557CCEA281B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestsProject", "UnitTests\UnitTestsProject.csproj", "{03696995-4C60-400C-A6ED-557CCEA281B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
