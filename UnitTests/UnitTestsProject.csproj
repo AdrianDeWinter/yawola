@@ -159,9 +159,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WOL App\WOL App.csproj">
+    <ProjectReference Include="..\yawola\yawola.csproj">
       <Project>{eb1d76d5-5ac1-4c1a-9200-f1aca285f28b}</Project>
-      <Name>WOL App</Name>
+      <Name>yawola</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
