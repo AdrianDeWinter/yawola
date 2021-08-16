@@ -7,7 +7,7 @@ using Windows.Storage;
 using System.Xml.Serialization;
 using System.IO;
 
-namespace WOL_App
+namespace yawola
 {
 	public sealed partial class MainPage : Page
 	{
@@ -105,9 +105,9 @@ namespace WOL_App
 			portInput.Text = t.Port;
 			macInput0.Text = t.Mac_string_array[0];
 			macInput1.Text = t.Mac_string_array[1];
-			macInput2.Text = t.Mac_string_array[2]; 
+			macInput2.Text = t.Mac_string_array[2];
 			macInput3.Text = t.Mac_string_array[3];
-			macInput4.Text = t.Mac_string_array[4]; 
+			macInput4.Text = t.Mac_string_array[4];
 			macInput5.Text = t.Mac_string_array[5];
 			_ = await addHostDialog.ShowAsync();
 		}

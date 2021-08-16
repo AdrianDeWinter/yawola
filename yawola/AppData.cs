@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Windows.Storage;
 
-namespace WOL_App
+namespace yawola
 {
 	/// <summary>
 	/// Holds any data that should be shared beween classes and/or persistet across application launches. Also handles storing and restoring data.

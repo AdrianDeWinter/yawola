@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace WOL_App
+namespace yawola
 {
 	///<summary>This class stores all information on an individual host, and provides functionality to interact with it.
 	/// <para>It provides two, mostly identical, constructors, one accepts the mac as a colon delimited string (ie<c>12:34:56:78:9A:BC</c>),

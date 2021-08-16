@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Windows.Storage;
-using WOL_App;
+using yawola;
 namespace UnitTests
 {
     [TestClass]
