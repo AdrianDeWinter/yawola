@@ -7,7 +7,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance local:DummyData,
+                                     IsDesignTimeCreatable=True}"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="490" Height="350">
 
     <Grid>

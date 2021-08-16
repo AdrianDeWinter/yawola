@@ -2,10 +2,6 @@
 using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using System.Collections.ObjectModel;
-using Windows.Storage;
-using System.Xml.Serialization;
-using System.IO;
 
 namespace yawola
 {
@@ -18,12 +14,13 @@ namespace yawola
 
 		private bool editing = false;
 
+		public DummyData data = new DummyData();
 		/// <summary>
 		/// The constructor called by the system when MainPage is to be displayed. Initializes the page and performs any preperation necessary
 		/// </summary>
 		public MainPage()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
 			//fill the popupFields array with references to all input fields in the addHostDialog
 			popupFields[0] = clientNameInput;
 			popupFields[1] = ipInput;
@@ -69,9 +66,9 @@ namespace yawola
 			{
 				target.SetAddress(ipInput.Text);
 				string[] mac = {
-				macInput0.Text, macInput1.Text ,
-				macInput2.Text, macInput3.Text ,
-				macInput4.Text, macInput5.Text
+					macInput0.Text, macInput1.Text ,
+					macInput2.Text, macInput3.Text ,
+					macInput4.Text, macInput5.Text
 				};
 				target.SetMac(mac);
 				target.SetPort(portInput.Text);
@@ -82,8 +79,9 @@ namespace yawola
 			{
 				Debug.WriteLine("Exception ocurred while updating targetList entry. Rolling back...");
 				Debug.WriteLine(e.Message);
+				//add the old WolTarget object back into the list
 				_ = AppData.targets.Remove(target);
-				AppData.targets.Insert(index, target);
+				AppData.targets.Insert(index, old);
 				TargetList.SelectedIndex = index;
 				return;
 			}
@@ -218,7 +216,7 @@ namespace yawola
 		/// <param name="e"></param>
 		private void SettingsButton_Click(object sender, RoutedEventArgs e)
 		{
-			this.Frame.Navigate(typeof(SettingsPage));
+			_ = Frame.Navigate(typeof(SettingsPage));
 		}
 
 		/// <summary>
@@ -236,10 +234,8 @@ namespace yawola
 			ListView listView = (ListView)sender;
 			targetContextFlyout.ShowAt(listView, e.GetPosition(listView));
 
-			WolTarget selectedItem = ((FrameworkElement)e.OriginalSource).DataContext as WolTarget;
-			
 			//if the user used right click to open the context menu, set selection to that item
-			if (selectedItem != null)
+			if (((FrameworkElement)e.OriginalSource).DataContext is WolTarget selectedItem)
 				TargetList.SelectedIndex = AppData.targets.IndexOf(selectedItem);
 			//if the keyboard context menu button was used, e.OriginalSource.DataKontext will be null. In that case, TargetList.selectedItem will be set and can be used instead
 			else

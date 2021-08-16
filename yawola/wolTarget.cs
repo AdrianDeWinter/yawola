@@ -11,6 +11,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Windows.UI.Xaml.Data;
 
 namespace yawola
 {
@@ -120,7 +121,7 @@ namespace yawola
 		}
 
 		public WolTarget()
-		{ }
+		{ Name = "defaul"; Address = "defaultAddress"; Port = "0"; Mac_string = "00:00:00:00:00:00"; }
 		/// <summary>
 		/// Creates a new instance of wolTarget. This overload accepts the mac address in the form of a colon delimited string..<br/>
 		/// Another overload exists which takes an array of six two char long strings as the mac address: <seealso cref="WolTarget(string, string[], string, string)"/>
@@ -453,14 +454,28 @@ namespace yawola
 		public override int GetHashCode()
 		{
 			int hashCode = -1060869375;
-			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Address);
-			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Port);
-			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Mac_string);
-			hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(Mac_string_array);
-			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-			hashCode = hashCode * -1521134295 + EqualityComparer<byte[]>.Default.GetHashCode(Mac);
-			hashCode = hashCode * -1521134295 + EqualityComparer<HostName>.Default.GetHashCode(HostName);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Address);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Port);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Mac_string);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string[]>.Default.GetHashCode(Mac_string_array);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Name);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<byte[]>.Default.GetHashCode(Mac);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<HostName>.Default.GetHashCode(HostName);
 			return hashCode;
+		}
+	}
+
+	public class AddressAndPortToStringConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, string language)
+		{
+			WolTarget t = (WolTarget)value;
+			return t.AddressAndPortString();
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, string language)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

@@ -56,8 +56,6 @@ namespace yawola
 
 				if (e.PreviousExecutionState == ApplicationExecutionState.Terminated || e.PreviousExecutionState == ApplicationExecutionState.ClosedByUser)
 				{
-					if (AppData.debug)
-						Debug.WriteLine("Loading last state from disk");
 					await AppData.LoadState();
 				}
 

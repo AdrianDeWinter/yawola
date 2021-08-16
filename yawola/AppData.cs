@@ -17,7 +17,6 @@ namespace yawola
 		/// The <see cref="WolTarget"/>'s displayed in the <see cref="MainPage"/>'s <see cref="MainPage.TargetList"/>
 		/// </summary>
 		public static readonly ObservableCollection<WolTarget> targets = new ObservableCollection<WolTarget>();
-		public static readonly WolTarget[] targets_designtime = { new WolTarget("192.168.188.1", "1A:2B:3C:4D:5E:6F", "test host", "11") };
 		/// <summary>
 		/// Indicates wether debug messages should be printed. Does not affect printing of exception messages
 		/// </summary>
@@ -90,7 +89,8 @@ namespace yawola
 				foreach (WolTarget t in (ObservableCollection<WolTarget>)serializer.Deserialize(reader))
 					targets.Add(t);
 			}
-			catch (Exception e){
+			catch (Exception e)
+			{
 				Debug.WriteLine(e.Message);
 				await FileIO.AppendTextAsync(logFile, e.Message + "\n");
 			}

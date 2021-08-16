@@ -5,15 +5,18 @@
     xmlns:local="using:yawola"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance local:DummyData, IsDesignTimeCreatable=True}"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:system="clr-namespace:yawola"
-    mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="490" Height="350">
-
+    <Page.Resources>
+        <local:AddressAndPortToStringConverter x:Key="AddressPortConverter"/>
+    </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="176*"/>
+            <ColumnDefinition Width="69*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="42"></RowDefinition>
@@ -21,22 +24,20 @@
         </Grid.RowDefinitions>
         <ListView x:Name="TargetList" BorderThickness="2"
                   BorderBrush="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                  Background="#EEEEEE"
-                  HorizontalAlignment="Stretch" Margin="5,0,5,5"
+                  Background="#EEEEEE" Margin="5,0,5,5"
                   SelectionMode="Single" IsItemClickEnabled="True"
                   Grid.Row="1" ItemClick="TargetList_ItemClick"
                   RightTapped="TargetList_RightTapped"
-                  ItemsSource="{x:Bind local:AppData.targets}">
-            <d:ListView.Items>
-                <local:WolTarget Name="testitem" Port="11" Address="localhost" Mac_string="10:11:12:13:14:15"></local:WolTarget>
-            </d:ListView.Items>
+                  ItemsSource="{x:Bind local:AppData.targets, Mode=OneWay}"
+                  d:ItemsSource="{Binding targets}"
+                  Grid.ColumnSpan="2">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:WolTarget">
                     <Grid>
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
-                            <TextBlock Text="{x:Bind AddressAndPortString(), Mode=OneWay}"/>
-                            <TextBlock Text="{x:Bind Mac_string, Mode=OneWay}"/>
+                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" d:Text="{Binding Name}" FontSize="18" FontWeight="Bold"/>
+                            <TextBlock Text="{x:Bind AddressAndPortString(), Mode=OneWay}" d:Text="{Binding Converter={StaticResource AddressPortConverter}}"/>
+                            <TextBlock Text="{x:Bind Mac_string, Mode=OneWay}" d:Text="{Binding Mac_string}"/>
                         </StackPanel>
                         <SymbolIcon Symbol="Send" HorizontalAlignment="Right"/>
                     </Grid>
@@ -65,20 +66,16 @@
             </ListView.Resources>
         </ListView>
 
-        <Button Name="AddButton" Click="Open_Add_Dialog"
-                VerticalAlignment="Top" Grid.Row="0" Margin="5,5,5,5"
-                HorizontalAlignment="Left">
+        <Button Name="AddButton" Click="Open_Add_Dialog" Margin="5,0,0,0">
             <StackPanel Orientation="Horizontal">
                 <SymbolIcon Symbol="Add" Margin="0,0,5,0"/>
                 <TextBlock Text="Add new host"></TextBlock>
             </StackPanel>
         </Button>
-        <Button Name="SettingsButton" Click="SettingsButton_Click"
-            VerticalAlignment="Top" Grid.Row="0" Margin="5,5,5,5"
-            HorizontalAlignment="Right">
+        <Button Name="SettingsButton" Click="SettingsButton_Click" Margin="95,0,0,0" Grid.Column="1">
             <SymbolIcon Symbol="Setting"/>
         </Button>
-        
+
         <ContentDialog
             Width="Auto"
             Margin="10,10,10,10"
