@@ -9,40 +9,92 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Linq;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Windows.UI.Xaml.Data;
 
-namespace WOL_App
+namespace yawola
 {
 	///<summary>This class stores all information on an individual host, and provides functionality to interact with it.
 	/// <para>It provides two, mostly identical, constructors, one accepts the mac as a colon delimited string (ie<c>12:34:56:78:9A:BC</c>),
 	/// and one that accepts an array of six, two character long, strings to represent each byte</para>
 	/// </summary>
 	[Serializable]
-	public class WolTarget : IXmlSerializable
+	public class WolTarget : IXmlSerializable, INotifyPropertyChanged
 	{
 		/// <summary>
 		/// The hosts address as entered in the input field. Should only be used for display porposes,<br/>
 		/// if code intends to work with the actual information, the <see cref="HostName"/> member should be used instead.
 		/// </summary>
-		public string Address { get; private set; } = "";
+		private string address;
+		public string Address
+		{
+			get => address;
+			set
+			{
+				if (value != address)
+				{
+					address = value;
+					NotifyPropertyChanged();
+				}
+			}
+		}
 		/// <summary>
 		/// The udp port this host should be messaged on (the setter (<see cref="SetPort(string)"/>) and <see cref="MainPage.addHostDialog"/> enforce this to be a string of digits)
 		/// </summary>
-		public string Port { get; private set; } = "";
+		private string port;
+		public string Port
+		{
+			get => port;
+			set
+			{
+				if (value != port)
+				{
+					port = value;
+					NotifyPropertyChanged();
+				}
+			}
+		}
 		/// <summary>
 		/// The string representation of the hosts mac address, represented as a colon delimited string (ie <c>12:34:56:78:9A:BC</c>).<br/>
 		/// Depending on the constructor used, this is either the original string passed to the constructor, or built from the array passed to the constructor.<br/>
 		/// Should only be used for display porposes, if code intends to work with the actual information, the <see cref="HostName"/> member should be used instead.
 		/// </summary>
-		public string Mac_string { get; private set; } = "";
+		private string mac_string;
+		public string Mac_string
+		{
+			get => mac_string;
+			set
+			{
+				if (value != mac_string)
+				{
+					mac_string = value;
+					NotifyPropertyChanged();
+				}
+			}
+		}
 		/// <summary>
 		/// The hosts mac address as a string array. Any code that wishes to work with the mac address should use the <see cref="Mac"/> memeber (and do so within the class).<br/>
 		/// If the mac address needs to be displayed, the <see cref="Mac_string"/> member should be used.
 		/// </summary>
 		public string[] Mac_string_array { get; private set; } = new string[6];
+
 		/// <summary>
 		/// A simple display name set by the user. Nothing fancy about this, should never be used in code since it is not cleaned in any way.
 		/// </summary>
-		public string Name { get; private set; } = "";
+		private string name;
+		public string Name
+		{
+			get => name;
+			set
+			{
+				if (value != name)
+				{
+					name = value;
+					NotifyPropertyChanged();
+				}
+			}
+		}
 
 		/// <summary>
 		/// The hosts mac address. Any code that wishes to work with the mac address should use this memeber (and do so within the class).<br/>
@@ -58,7 +110,18 @@ namespace WOL_App
 		/// <remarks>This member is deliberatly private, to ensure any code accessing the actual address of this object does so within the class, or uses the appropriate setter (<see cref="SetAddress(string)"/>)</remarks>
 		private HostName HostName = null;
 
-		private WolTarget() { }
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		// This method is called by the Set accessor of each property.  
+		// The CallerMemberName attribute that is applied to the optional propertyName  
+		// parameter causes the property name of the caller to be substituted as an argument.  
+		private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
+		}
+
+		public WolTarget()
+		{ Name = "defaul"; Address = "defaultAddress"; Port = "0"; Mac_string = "00:00:00:00:00:00"; }
 		/// <summary>
 		/// Creates a new instance of wolTarget. This overload accepts the mac address in the form of a colon delimited string..<br/>
 		/// Another overload exists which takes an array of six two char long strings as the mac address: <seealso cref="WolTarget(string, string[], string, string)"/>
@@ -113,7 +176,24 @@ namespace WOL_App
 				throw e;
 			}
 		}
+		public WolTarget(WolTarget t)
+		{
+			//evaluate the name string, throw appropriate exception if necessary
+			if (t.Name.Length == 0)
+				throw new ArgumentException("The display name for a WolTarget cannot be empty");
+			Name = t.Name ?? throw new ArgumentNullException("The display name for a WolTarget cannot be null");
 
+			try
+			{
+				SetAddress(t.Address);
+				SetPort(t.Port);
+				ParseMac(t.Mac_string_array);
+			}
+			catch (Exception e)
+			{
+				throw e;
+			}
+		}
 		/// <summary>
 		/// Sets the <see cref="Address"/> and <see cref="HostName"/> members
 		/// </summary>
@@ -146,6 +226,25 @@ namespace WOL_App
 			try
 			{
 				ParseMac(macArray);
+			}
+			catch (Exception e)
+			{
+				throw e;
+			}
+		}
+		/// <summary>
+		/// Sets the mac address
+		/// </summary>
+		/// <param name="mac">An array of strings representing the six bytes of the mac</param>
+		/// <exception cref="ArgumentException">Thrown if the string did not conform to the correct format</exception>
+		/// <exception cref="ArgumentNullException">Thrown if the string was null</exception>
+		/// <exception cref="FormatException">Thrown if the string was not of the correct format.</exception>
+		/// <exception cref="OverflowException">Thrown if a part of the string represents a number less than MinValue or greater than MaxValue or includes non-zero, fractional digits.</exception>
+		public void SetMac(string[] mac)
+		{
+			try
+			{
+				ParseMac(mac);
 			}
 			catch (Exception e)
 			{
@@ -355,14 +454,28 @@ namespace WOL_App
 		public override int GetHashCode()
 		{
 			int hashCode = -1060869375;
-			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Address);
-			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Port);
-			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Mac_string);
-			hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(Mac_string_array);
-			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-			hashCode = hashCode * -1521134295 + EqualityComparer<byte[]>.Default.GetHashCode(Mac);
-			hashCode = hashCode * -1521134295 + EqualityComparer<HostName>.Default.GetHashCode(HostName);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Address);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Port);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Mac_string);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string[]>.Default.GetHashCode(Mac_string_array);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Name);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<byte[]>.Default.GetHashCode(Mac);
+			hashCode = (hashCode * -1521134295) + EqualityComparer<HostName>.Default.GetHashCode(HostName);
 			return hashCode;
+		}
+	}
+
+	public class AddressAndPortToStringConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, string language)
+		{
+			WolTarget t = (WolTarget)value;
+			return t.AddressAndPortString();
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, string language)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

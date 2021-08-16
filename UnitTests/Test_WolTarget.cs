@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using WOL_App;
+using yawola;
 
 namespace UnitTests
 {

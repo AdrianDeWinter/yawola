@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -16,7 +17,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace WOL_App
+namespace yawola
 {
 	/// <summary>
 	/// Provides application-specific behavior to supplement the default Application class.
@@ -57,7 +58,7 @@ namespace WOL_App
 				{
 					await AppData.LoadState();
 				}
-				
+
 				// Place the frame in the current Window
 				Window.Current.Content = rootFrame;
 			}

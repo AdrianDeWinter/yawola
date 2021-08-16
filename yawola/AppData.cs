@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Windows.Storage;
 
-namespace WOL_App
+namespace yawola
 {
 	/// <summary>
 	/// Holds any data that should be shared beween classes and/or persistet across application launches. Also handles storing and restoring data.
@@ -89,7 +89,8 @@ namespace WOL_App
 				foreach (WolTarget t in (ObservableCollection<WolTarget>)serializer.Deserialize(reader))
 					targets.Add(t);
 			}
-			catch (Exception e){
+			catch (Exception e)
+			{
 				Debug.WriteLine(e.Message);
 				await FileIO.AppendTextAsync(logFile, e.Message + "\n");
 			}

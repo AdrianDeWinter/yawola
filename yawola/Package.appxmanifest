@@ -30,7 +30,7 @@
   <Applications>
     <Application Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="WOL_App.App">
+      EntryPoint="yawola.App">
       <uap:VisualElements
         DisplayName="YaWOLA"
         Square150x150Logo="Assets\Square150x150Logo.png"

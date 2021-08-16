@@ -1,13 +1,16 @@
 <Page
-    x:Class="WOL_App.SettingsPage"
+    x:Class="yawola.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:WOL_App"
+    xmlns:local="using:yawola"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance local:DummyData,
+                                     IsDesignTimeCreatable=True}"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="490" Height="350">
 
     <Grid>
