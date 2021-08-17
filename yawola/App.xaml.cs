@@ -30,8 +30,6 @@ namespace yawola
 		/// </summary>
 		public App()
 		{
-			ApplicationView.PreferredLaunchViewSize = new Size(350, 350);
-			ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 			this.InitializeComponent();
 			this.Suspending += OnSuspending;
 		}
@@ -53,8 +51,8 @@ namespace yawola
 				rootFrame = new Frame();
 
 				rootFrame.NavigationFailed += OnNavigationFailed;
-
-				if (e.PreviousExecutionState == ApplicationExecutionState.Terminated || e.PreviousExecutionState == ApplicationExecutionState.ClosedByUser)
+				//unless the app is already running ore coming back from suspension, load state from disk
+				if (e.PreviousExecutionState != ApplicationExecutionState.Running && e.PreviousExecutionState != ApplicationExecutionState.Suspended)
 				{
 					await AppData.LoadState();
 				}

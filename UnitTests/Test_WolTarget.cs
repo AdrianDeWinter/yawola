@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Threading.Tasks;
 using yawola;
 
 namespace UnitTests
@@ -119,9 +120,11 @@ namespace UnitTests
         private static WolTarget t;
 
         [TestInitialize]
-        public void TestInitialize()
+        public async Task TestInitializeAsync()
         {
             t = new WolTarget("addr", ":::::", "name", "1");
+            await AppData.LoadState();
+            AppData.UpdateSetting(AppData.Setting.defaultPort, 42);
         }
 
         [TestMethod]
@@ -137,14 +140,16 @@ namespace UnitTests
         {
             string newPort = "";
             t.SetPort(newPort);
-            Assert.AreEqual("9999", t.Port, "SetPort did not default to port 9999 when given an empty string");
+            int defaultPort = (int)AppData.GetSetting(AppData.Setting.defaultPort);
+            Assert.AreEqual(defaultPort.ToString(), t.Port, string.Format("SetPort did not default to the default port ({0}) when given an empty string", defaultPort));
         }
 
         [TestMethod]
         public void Test_SetPort_NoString()
         {
             t.SetPort();
-            Assert.AreEqual("9999", t.Port, "SetPort did not default to port 9999 when given no string");
+            int defaultPort = (int)AppData.GetSetting(AppData.Setting.defaultPort);
+            Assert.AreEqual(defaultPort.ToString(), t.Port, string.Format("SetPort did not default to the default port ({0}) when given an empty string", defaultPort));
         }
 
         [TestMethod]

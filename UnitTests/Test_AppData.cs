@@ -32,8 +32,15 @@ namespace UnitTests
             testFile = await localFolder.CreateFileAsync("testdata", CreationCollisionOption.ReplaceExisting);
             Stream stream = await testFile.OpenStreamForWriteAsync();
             serializer.Serialize(stream, new ObservableCollection<WolTarget> { t });
-        }
 
+            //ensure the app reads localData rather than RoamingData
+            ApplicationDataContainer c = ApplicationData.Current.LocalSettings;
+            c.Values.Clear();
+            ApplicationData.Current.RoamingSettings.Values.Clear();
+            c.Values.Add(((int)AppData.Setting.none).ToString(), "");
+            c.Values.Add(((int)AppData.Setting.useRoamingSettings).ToString(), false);
+            AppData.GetSettingsContainerAndDataFolder();
+        }
 
         /// <summary>
         /// Test a simple case of storing something into <see cref="AppData"/> and then serializing and deserializing it.

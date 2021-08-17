@@ -9,14 +9,13 @@
     d:DataContext="{d:DesignInstance local:DummyData, IsDesignTimeCreatable=True}"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="490" Height="350">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Page.Resources>
         <local:AddressAndPortToStringConverter x:Key="AddressPortConverter"/>
     </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="176*"/>
-            <ColumnDefinition Width="69*"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="42"></RowDefinition>
@@ -72,7 +71,7 @@
                 <TextBlock Text="Add new host"></TextBlock>
             </StackPanel>
         </Button>
-        <Button Name="SettingsButton" Click="SettingsButton_Click" Margin="95,0,0,0" Grid.Column="1">
+        <Button Name="SettingsButton" Click="SettingsButton_Click" Margin="0,0,5,0" Grid.Column="1" HorizontalAlignment="Right">
             <SymbolIcon Symbol="Setting"/>
         </Button>
 

@@ -45,7 +45,7 @@ namespace yawola
 		private string port;
 		public string Port
 		{
-			get => port;
+			get { if (port.Length != 0) return port; else return ((int)AppData.GetSetting(AppData.Setting.defaultPort)).ToString(); }
 			set
 			{
 				if (value != port)
@@ -311,7 +311,7 @@ namespace yawola
 			if (port == null)
 				throw new ArgumentNullException("SetPort does not accept null as an input");
 			if (port.Length == 0)
-				Port = "9999";
+				Port = "";
 			else
 			{
 				//parse the port string as an int to ensure it is a valid port number

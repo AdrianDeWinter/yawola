@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using Windows.Foundation;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -21,6 +23,9 @@ namespace yawola
 		public MainPage()
 		{
 			InitializeComponent();
+			ApplicationView.PreferredLaunchViewSize = new Size(490, 350);
+			ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+			ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(490, 350));
 			//fill the popupFields array with references to all input fields in the addHostDialog
 			popupFields[0] = clientNameInput;
 			popupFields[1] = ipInput;
