@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using Windows.Foundation.Collections;
 using Windows.Storage;
 
 namespace yawola

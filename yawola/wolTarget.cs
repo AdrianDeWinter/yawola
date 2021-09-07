@@ -45,7 +45,7 @@ namespace yawola
 		private string port;
 		public string Port
 		{
-			get { if (port.Length != 0) return port; else return ((int)AppData.GetSetting(AppData.Setting.defaultPort)).ToString(); }
+			get => port.Length != 0 ? port : ((int)AppData.GetSetting(AppData.Setting.defaultPort)).ToString();
 			set
 			{
 				if (value != port)
@@ -348,37 +348,49 @@ namespace yawola
 		/// Sends a magic pcket to wake the host
 		/// </summary>
 		/// <param name="debug">Wether debug information should be printed</param>
-		/// <returns>true if the opration succeeded, false if any exceptions ocurred</returns>
+		/// <returns>true if at least one packet was sent successfully, false if attempts failed</returns>
 		public async Task<bool> SendMagicPacket()
 		{
-			if (AppData.debug)
-			{
-				Debug.WriteLine("Sending packet:");
-				Debug.WriteLine(ToString());
-			}
-
-			DatagramSocket socket = new DatagramSocket();
-			//get out stream to the selected targetf
-			IOutputStream outStream = await socket.GetOutputStreamAsync(HostName, Port);
-
-			//obtain writer for the stream
-			DataWriter writer = new DataWriter(outStream);
-			//write the packet to the stream
-			if (AppData.debug)
-				Debug.WriteLine("writing data");
-			writer.WriteBytes(MagicPacket());
-			if (await writer.StoreAsync() == 102)
+			int retryCount = (int)AppData.GetSetting(AppData.Setting.wakeAttemptCount);
+			bool result = false;
+			for (int i = 0; i <= retryCount; i++)
 			{
 				if (AppData.debug)
-					Debug.WriteLine("Packet sent");
-				return true;
-			}
-			else
-			{
+				{
+					Debug.WriteLine(string.Format("Sending packet {0} of {1}:", i, retryCount));
+					Debug.WriteLine(ToString());
+				}
+
+				DatagramSocket socket = new DatagramSocket();
+				//get out stream to the selected targetf
+				IOutputStream outStream = await socket.GetOutputStreamAsync(HostName, Port);
+
+				//obtain writer for the stream
+				DataWriter writer = new DataWriter(outStream);
+				//write the packet to the stream
 				if (AppData.debug)
-					Debug.WriteLine("Sending the packet failed");
-				return false;
+					Debug.WriteLine("Writing data...");
+				writer.WriteBytes(MagicPacket());
+				if (await writer.StoreAsync() == 102)
+				{
+					if (AppData.debug)
+						Debug.WriteLine("Packet sent!");
+					result = true;
+				}
+				else
+				{
+					if (AppData.debug)
+						Debug.WriteLine("Sending the packet failed!");
+				}
 			}
+			if (AppData.debug)
+			{
+				if (result)
+					Debug.WriteLine("Succesfully sent the magic packet");
+				else
+					Debug.WriteLine("Failed to send the magic packet");
+			}
+			return result;
 		}
 		/// <summary>
 		/// An override of the Object.ToString method.
