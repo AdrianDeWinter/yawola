@@ -8,22 +8,14 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
+    d:DataContext="{d:DesignInstance Type=local:WolTarget}"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid Margin="5,5,5,5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Button
-        HorizontalAlignment="Right"
-        VerticalAlignment="Top"
-        Grid.Column = "1"
-        Name="CloseSettingsButton"
-        Click="CloseSettingsButton_Click">
-            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8BB;"/>
-        </Button>
         <StackPanel Orientation="Vertical">
             <ToggleSwitch x:Name="RoamSettingsSwitch" Header="Use roaming settings:"/>
             <TextBox x:Name="WakeAttemptInput" Header="Number of wake attempts:" InputScope="Number"/>

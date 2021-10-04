@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 using Windows.Foundation;
+using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 
 namespace yawola
 {
@@ -36,6 +39,7 @@ namespace yawola
 			popupFields[6] = macInput4;
 			popupFields[7] = macInput5;
 			popupFields[8] = portInput;
+			SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
 		}
 
 		/// <summary>
@@ -76,7 +80,7 @@ namespace yawola
 					macInput4.Text, macInput5.Text
 				};
 				target.SetMac(mac);
-				target.SetPort(portInput.Text);
+				target.Port = portInput.Text;
 				target.Name = clientNameInput.Text;
 
 			}
@@ -231,9 +235,24 @@ namespace yawola
 		/// <param name="e"></param>
 		private void TargetList_ItemClick(object sender, ItemClickEventArgs e)
 		{
+			if (!NetworkInterface.GetIsNetworkAvailable())
+			{
+				if (AppData.debug)
+					Debug.WriteLine("No network available");
+				DisplayMessageToUser(MessageType.NoNetwork);
+				return;
+			}
+			else
+			if (AppData.debug)
+				Debug.WriteLine("network found");
 			_ = ((WolTarget)e.ClickedItem).SendMagicPacket();
 		}
 
+		/// <summary>
+		/// Callbck for the <see cref="TargetList"/>'s ItemClicked RightTapped, opens a context menu on the <see cref="WolTarget"/>
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void TargetList_RightTapped(object sender, Windows.UI.Xaml.Input.RightTappedRoutedEventArgs e)
 		{
 			ListView listView = (ListView)sender;
@@ -251,5 +270,37 @@ namespace yawola
 					TargetList.SelectedIndex = 0;
 			}
 		}
+
+		/// <summary>
+		/// Displays a predetermined, localized flyout message to the user.
+		/// </summary>
+		/// <param name="message">What message to display</param>
+		/// <exception cref="ArgumentException">Thrown if a value is passed for message that is not a valid MessageType</exception>
+		public void DisplayMessageToUser(MessageType message)
+		{
+			switch (message)
+			{
+				case MessageType.NoNetwork:
+					infoPopupText.Text = "There is no network connection available";
+					FlyoutBase.ShowAttachedFlyout(mainPage);
+					break;
+				case MessageType.HostNotFound:
+					infoPopupText.Text = "The address or host name could not be found";
+					FlyoutBase.ShowAttachedFlyout(mainPage);
+					break;
+				case MessageType.LoadingDataFailed:
+					infoPopupText.Text = "Unable to load user data from disk";
+					FlyoutBase.ShowAttachedFlyout(mainPage);
+					break;
+				default: throw new ArgumentException(string.Format("Invalid value {0} given for enum message of type MessageType", message));
+			}
+		}
+	}
+
+	public enum MessageType
+	{
+		NoNetwork,
+		HostNotFound,
+		LoadingDataFailed
 	}
 }

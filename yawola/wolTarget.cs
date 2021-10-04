@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Windows.UI.Xaml.Data;
+using System.Net.NetworkInformation;
 
 namespace yawola
 {
@@ -48,8 +49,30 @@ namespace yawola
 			get => port.Length != 0 ? port : ((int)AppData.GetSetting(AppData.Setting.defaultPort)).ToString();
 			set
 			{
+			//TODO: would be better implmeneted as a init accessor, but that requires switching to C# 9.0+
+				if (port == null)
+					port = "";
 				if (value != port)
 				{
+					//fall back to the configured default port number if an empty string was passed
+					if (port.Length == 0) {
+						dynamic defaultPortSetting = AppData.GetSetting(AppData.Setting.defaultPort);
+						string defaultPortNumber = defaultPortSetting.GetType() == typeof(int) ? defaultPortSetting.ToString() : (string)defaultPortSetting;
+						port = defaultPortNumber;
+					}
+					else
+					{
+						//parse the port string as an int to ensure it is a valid port number
+						try
+						{
+							ushort p = ushort.Parse(port);
+						}
+						catch (Exception e)
+						{
+							return;
+						}
+						Port = port;
+					}
 					port = value;
 					NotifyPropertyChanged();
 				}
@@ -140,7 +163,7 @@ namespace yawola
 			try
 			{
 				SetAddress(address);
-				SetPort(port);
+				Port = port;
 				SetMac(mac);
 			}
 			catch (Exception e)
@@ -168,7 +191,7 @@ namespace yawola
 			try
 			{
 				SetAddress(address);
-				SetPort(port);
+				Port = port;
 				ParseMac(mac);
 			}
 			catch (Exception e)
@@ -186,7 +209,7 @@ namespace yawola
 			try
 			{
 				SetAddress(t.Address);
-				SetPort(t.Port);
+				Port = t.Port;
 				ParseMac(t.Mac_string_array);
 			}
 			catch (Exception e)
@@ -305,7 +328,7 @@ namespace yawola
 		/// <exception cref="ArgumentNullException">Thrown if the string was null</exception>
 		/// <exception cref="FormatException">Thrown if the string was not of the correct format.</exception>
 		/// <exception cref="OverflowException">Thrown if a part of the string represents a number less than 0 or greater than 65535.</exception>
-		public void SetPort(string port = "")
+		/*public void SetPort(string port = "")
 		{
 			//default to port 9999 if an empty string was passed
 			if (port == null)
@@ -325,7 +348,7 @@ namespace yawola
 				}
 				Port = port;
 			}
-		}
+		}*/
 		/// <summary>
 		/// Builds an returns a magic packet for this host.
 		/// </summary>
@@ -362,9 +385,20 @@ namespace yawola
 				}
 
 				DatagramSocket socket = new DatagramSocket();
-				//get out stream to the selected targetf
-				IOutputStream outStream = await socket.GetOutputStreamAsync(HostName, Port);
 
+				IOutputStream outStream;
+				//get out stream to the selected target
+				try
+				{
+					outStream = await socket.GetOutputStreamAsync(HostName, Port);
+				}
+				catch(Exception e){
+					if (AppData.debug)
+						Debug.WriteLine("An exception ocurred while creating the output stream:\n" + e.Message);
+					else
+						Debug.WriteLine("Sending failed");
+					continue;
+				}
 				//obtain writer for the stream
 				DataWriter writer = new DataWriter(outStream);
 				//write the packet to the stream
@@ -416,7 +450,7 @@ namespace yawola
 			Name = reader.GetAttribute("name");
 			SetAddress(reader.GetAttribute("addr"));
 			SetMac(reader.GetAttribute("mac"));
-			SetPort(reader.GetAttribute("port"));
+			Port = reader.GetAttribute("port");
 			bool isEmptyElement = reader.IsEmptyElement;
 			reader.ReadStartElement();
 			if (!isEmptyElement)

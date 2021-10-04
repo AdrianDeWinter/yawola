@@ -21,11 +21,11 @@ namespace yawola
 		/// <summary>
 		/// Contains all settings
 		/// </summary>
-		private static readonly Dictionary<Setting, object> settings = new Dictionary<Setting, object>();
+		private static readonly Dictionary<Setting, object> settings = new Dictionary<Setting, dynamic>();
 		/// <summary>
 		/// The default settings
 		/// </summary>
-		private static readonly Dictionary<Setting, object> defaultSettings = new Dictionary<Setting, object>()
+		private static readonly Dictionary<Setting, object> defaultSettings = new Dictionary<Setting, dynamic>()
 		{
 			{Setting.windowWidth, 490 },
 			{Setting.windowHeight, 350 },
@@ -173,12 +173,31 @@ namespace yawola
 			foreach (KeyValuePair<Setting, object> s in defaultSettings)
 			{
 				if (settingsContainer.Values.TryGetValue(((int)s.Key).ToString(), out object o))
-					settings.Add(s.Key, o);
+				//restore original type of the value object
+					settings.Add(s.Key, RestoreTypeOfValue(o));
 				else
 					settings.Add(s.Key, s.Value);
 			}
 			settings.Add(Setting.none, "");
 			await FileIO.AppendTextAsync(logFile, "Finished reading settings file\n");
+		}
+
+		/// <summary>
+		/// Determines the original tpye of the object o and returns it after casting it to that
+		/// </summary>
+		/// <param name="o">The object whose type should bes retored</param>
+		/// <returns>the restored object</returns>
+		private static dynamic RestoreTypeOfValue(object o){
+			Type typeOfSetting = o.GetType();
+			if (typeOfSetting == typeof(string))
+				return (string)o;
+			if (typeOfSetting == typeof(int))
+				return (int)o;
+			if (typeOfSetting == typeof(byte))
+				return (byte)o;
+			if (typeOfSetting == typeof(bool))
+				return (bool)o;
+			return o;
 		}
 		/// <summary>
 		/// Saves the settings in <see cref="settings"/> to <see cref="settingsContainer"/>
@@ -204,7 +223,7 @@ namespace yawola
 		/// <param name="key">The key to update</param>
 		/// <param name="value">The new value</param>
 		/// <exception cref="ArgumentException">Thrown if the key does not exist in the settings, or could not be romved</exception>
-		public static void UpdateSetting(Setting key, object value){
+		public static void UpdateSetting(Setting key, dynamic value){
 			if (!settings.Remove(key))
 				throw new ArgumentException("The key \"" + key + "\" does not exist in the settings");
 			settings.Add(key, value);
@@ -215,11 +234,11 @@ namespace yawola
 		/// <param name="key">The key to update</param>
 		/// <param name="value">The new value</param>
 		/// <exception cref="ArgumentException">Thrown if the key does not exist in the settings</exception>
-		public static object GetSetting(Setting key)
+		public static dynamic GetSetting(Setting key)
 		{
 			if (!settings.TryGetValue(key, out object o))
 				throw new ArgumentException("The key \"" + key + "\" does not exist in the settings");
-			return o;
+			return RestoreTypeOfValue(o);
 		}
 		/// <summary>
 		/// Serializes the list of <see cref="WolTarget"/>s in <see cref="targets"/> to <see cref="dataFolder"/>/<see cref="hostsFileName"/>

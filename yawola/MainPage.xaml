@@ -9,10 +9,18 @@
     d:DataContext="{d:DesignInstance local:DummyData, IsDesignTimeCreatable=True}"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    x:Name="mainPage">
     <Page.Resources>
         <local:AddressAndPortToStringConverter x:Key="AddressPortConverter"/>
     </Page.Resources>
+
+    <FlyoutBase.AttachedFlyout>
+        <Flyout x:Name="infoPopup">
+            <TextBlock x:Name="infoPopupText" Style="{ThemeResource BaseTextBlockStyle}" Text="" Margin="0,0,0,12" />
+        </Flyout>
+    </FlyoutBase.AttachedFlyout>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -21,6 +29,7 @@
             <RowDefinition Height="42"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
+
         <ListView x:Name="TargetList" BorderThickness="2"
                   BorderBrush="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
                   Background="#EEEEEE" Margin="5,0,5,5"
