@@ -7,17 +7,43 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.ApplicationModel.DataTransfer;
+using System.Text.RegularExpressions;
 
 namespace yawola
 {
 	public sealed partial class MainPage : Page
 	{
 		/// <summary>
+		/// A <see cref="System.Text.RegularExpression"/> that matches Mac addresses in Hexadecimal format, accepting either dashes or colons as separators (but not both).
+		/// Blocks can also consist of only one digit, or be blank, but all five separators must be present.
+		/// </summary>
+		/// <example>
+		/// Accepted:
+		/// 12:34:56:78:9A:BC
+		/// 12-34-56-78-9A-BC
+		/// 1:4:6:78::C
+		/// -----
+		/// :::::
+		/// Not accepted:
+		/// ::::
+		/// 1:g::::
+		/// 12:34-56-78-9A:BC
+		/// </example>
+		private readonly Regex macAddressExpression = new Regex(@"^[a-fA-F0-9]{0,2}((:[a-fA-F0-9]{0,2}){5}$|^[a-fA-F0-9]{0,2}(-[a-fA-F0-9]{0,2}){5}$)");
+		/// <summary>
+		/// Machtes a single byte in hexa-decimal notation (upper and lowercase are both ccepted and can be mixed)
+		/// </summary>
+		private readonly Regex hexByteExpression = new Regex(@"^[a-fA-F0-9]{0,2}$");
+		/// <summary>
 		/// an array holding references to all fields in the <see cref="addHostDialog"/> to enable easier removal of inputted text wehn the user cancels the operation
 		/// </summary>
 		private readonly TextBox[] popupFields = new TextBox[9];
 
 		private bool editing = false;
+
+		//flag used to disable all TextChanged event handlers whenver prgrammatic changes of TextBoxes ocurr
+		private bool disable_Textchanged = false;
 
 		public DummyData data = new DummyData();
 		/// <summary>
@@ -294,6 +320,55 @@ namespace yawola
 					break;
 				default: throw new ArgumentException(string.Format("Invalid value {0} given for enum message of type MessageType", message));
 			}
+		}
+
+		private void TextChangedHandler(Object sender, Windows.UI.Xaml.Controls.TextChangedEventArgs args)
+		{
+			if (!disable_Textchanged)
+			{
+				Debug.WriteLine("Jumping...");
+				int index = Array.IndexOf(popupFields, sender);
+				//move cursor to next MAC field if the text in the current box has reched two characters in length
+				if (((TextBox)sender).Text.Length > 1)
+					JumpToTextBox(index + 1);
+			}
+			ValidateAddHostForm(sender, args);
+		}
+
+		private void JumpToTextBox(int index){
+			_ = ((TextBox)popupFields.GetValue(index)).Focus(FocusState.Programmatic);
+		}
+
+		private async void MacPaste(object sender, TextControlPasteEventArgs e)
+		{
+			//mark the event as handled to suppress the os's handling of it
+			e.Handled = true;
+			//disable TextChanged event handlers to stop the from firing when we paste the clipboard content
+			disable_Textchanged = true;
+			DataPackageView dataPackageView = Clipboard.GetContent();
+			if (dataPackageView.Contains(StandardDataFormats.Text)) {
+			//get the pasted string and see if it can be interpreted as a mac
+				string text = await dataPackageView.GetTextAsync();
+				if (macAddressExpression.Match(text).Success)
+				{
+					//write the mac address into the mac fields
+					string[] subStrings = text.Split(':');
+					//if splitting on colons did not yield more than one substring, split on dashes
+					if (subStrings.Length == 1)
+						subStrings = text.Split('-');
+					for (int i = 0; i <= 5; i++)
+						popupFields[i + 2].Text = subStrings[i];
+					JumpToTextBox(8);
+				}
+				//if the pasted text conforms to a singe hex byte, paste it
+				else if (hexByteExpression.Match(text).Success)
+				{
+					int index = Array.IndexOf(popupFields, sender);
+					((TextBox)sender).Text = text;
+					JumpToTextBox(index + 1);
+				}
+			}
+			disable_Textchanged = false;
 		}
 	}
 
