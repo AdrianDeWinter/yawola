@@ -374,13 +374,13 @@ namespace yawola
 		/// <returns>true if at least one packet was sent successfully, false if attempts failed</returns>
 		public async Task<bool> SendMagicPacket()
 		{
-			int retryCount = (int)AppData.GetSetting(AppData.Setting.wakeAttemptCount);
+			int wakeAttemptCount = (int)AppData.GetSetting(AppData.Setting.wakeAttemptCount);
 			bool result = false;
-			for (int i = 0; i <= retryCount; i++)
+			for (int i = 0; i < wakeAttemptCount; i++)
 			{
 				if (AppData.debug)
 				{
-					Debug.WriteLine(string.Format("Sending packet {0} of {1}:", i, retryCount));
+					Debug.WriteLine(string.Format("Sending packet {0} of {1}:", i, wakeAttemptCount));
 					Debug.WriteLine(ToString());
 				}
 
