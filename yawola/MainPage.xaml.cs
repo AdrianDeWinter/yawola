@@ -1,18 +1,49 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
+using Windows.Foundation;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.ApplicationModel.DataTransfer;
+using System.Text.RegularExpressions;
 
 namespace yawola
 {
 	public sealed partial class MainPage : Page
 	{
 		/// <summary>
+		/// A <see cref="System.Text.RegularExpression"/> that matches Mac addresses in Hexadecimal format, accepting either dashes or colons as separators (but not both).
+		/// Blocks can also consist of only one digit, or be blank, but all five separators must be present.
+		/// </summary>
+		/// <example>
+		/// Accepted:
+		/// 12:34:56:78:9A:BC
+		/// 12-34-56-78-9A-BC
+		/// 1:4:6:78::C
+		/// -----
+		/// :::::
+		/// Not accepted:
+		/// ::::
+		/// 1:g::::
+		/// 12:34-56-78-9A:BC
+		/// </example>
+		private readonly Regex macAddressExpression = new Regex(@"^[a-fA-F0-9]{0,2}((:[a-fA-F0-9]{0,2}){5}$|^[a-fA-F0-9]{0,2}(-[a-fA-F0-9]{0,2}){5}$)");
+		/// <summary>
+		/// Machtes a single byte in hexa-decimal notation (upper and lowercase are both ccepted and can be mixed)
+		/// </summary>
+		private readonly Regex hexByteExpression = new Regex(@"^[a-fA-F0-9]{0,2}$");
+		/// <summary>
 		/// an array holding references to all fields in the <see cref="addHostDialog"/> to enable easier removal of inputted text wehn the user cancels the operation
 		/// </summary>
 		private readonly TextBox[] popupFields = new TextBox[9];
 
 		private bool editing = false;
+
+		//flag used to disable all TextChanged event handlers whenver prgrammatic changes of TextBoxes ocurr
+		private bool disable_Textchanged = false;
 
 		public DummyData data = new DummyData();
 		/// <summary>
@@ -21,6 +52,9 @@ namespace yawola
 		public MainPage()
 		{
 			InitializeComponent();
+			ApplicationView.PreferredLaunchViewSize = new Size(490, 350);
+			ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+			ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(490, 350));
 			//fill the popupFields array with references to all input fields in the addHostDialog
 			popupFields[0] = clientNameInput;
 			popupFields[1] = ipInput;
@@ -31,6 +65,7 @@ namespace yawola
 			popupFields[6] = macInput4;
 			popupFields[7] = macInput5;
 			popupFields[8] = portInput;
+			SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
 		}
 
 		/// <summary>
@@ -71,7 +106,7 @@ namespace yawola
 					macInput4.Text, macInput5.Text
 				};
 				target.SetMac(mac);
-				target.SetPort(portInput.Text);
+				target.Port = portInput.Text;
 				target.Name = clientNameInput.Text;
 
 			}
@@ -226,9 +261,24 @@ namespace yawola
 		/// <param name="e"></param>
 		private void TargetList_ItemClick(object sender, ItemClickEventArgs e)
 		{
+			if (!NetworkInterface.GetIsNetworkAvailable())
+			{
+				if (AppData.debug)
+					Debug.WriteLine("No network available");
+				DisplayMessageToUser(MessageType.NoNetwork);
+				return;
+			}
+			else
+			if (AppData.debug)
+				Debug.WriteLine("network found");
 			_ = ((WolTarget)e.ClickedItem).SendMagicPacket();
 		}
 
+		/// <summary>
+		/// Callbck for the <see cref="TargetList"/>'s ItemClicked RightTapped, opens a context menu on the <see cref="WolTarget"/>
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void TargetList_RightTapped(object sender, Windows.UI.Xaml.Input.RightTappedRoutedEventArgs e)
 		{
 			ListView listView = (ListView)sender;
@@ -246,5 +296,86 @@ namespace yawola
 					TargetList.SelectedIndex = 0;
 			}
 		}
+
+		/// <summary>
+		/// Displays a predetermined, localized flyout message to the user.
+		/// </summary>
+		/// <param name="message">What message to display</param>
+		/// <exception cref="ArgumentException">Thrown if a value is passed for message that is not a valid MessageType</exception>
+		public void DisplayMessageToUser(MessageType message)
+		{
+			switch (message)
+			{
+				case MessageType.NoNetwork:
+					infoPopupText.Text = "There is no network connection available";
+					FlyoutBase.ShowAttachedFlyout(mainPage);
+					break;
+				case MessageType.HostNotFound:
+					infoPopupText.Text = "The address or host name could not be found";
+					FlyoutBase.ShowAttachedFlyout(mainPage);
+					break;
+				case MessageType.LoadingDataFailed:
+					infoPopupText.Text = "Unable to load user data from disk";
+					FlyoutBase.ShowAttachedFlyout(mainPage);
+					break;
+				default: throw new ArgumentException(string.Format("Invalid value {0} given for enum message of type MessageType", message));
+			}
+		}
+
+		private void TextChangedHandler(Object sender, Windows.UI.Xaml.Controls.TextChangedEventArgs args)
+		{
+			if (!disable_Textchanged)
+			{
+				Debug.WriteLine("Jumping...");
+				int index = Array.IndexOf(popupFields, sender);
+				//move cursor to next MAC field if the text in the current box has reched two characters in length
+				if (((TextBox)sender).Text.Length > 1)
+					JumpToTextBox(index + 1);
+			}
+			ValidateAddHostForm(sender, args);
+		}
+
+		private void JumpToTextBox(int index){
+			_ = ((TextBox)popupFields.GetValue(index)).Focus(FocusState.Programmatic);
+		}
+
+		private async void MacPaste(object sender, TextControlPasteEventArgs e)
+		{
+			//mark the event as handled to suppress the os's handling of it
+			e.Handled = true;
+			//disable TextChanged event handlers to stop the from firing when we paste the clipboard content
+			disable_Textchanged = true;
+			DataPackageView dataPackageView = Clipboard.GetContent();
+			if (dataPackageView.Contains(StandardDataFormats.Text)) {
+			//get the pasted string and see if it can be interpreted as a mac
+				string text = await dataPackageView.GetTextAsync();
+				if (macAddressExpression.Match(text).Success)
+				{
+					//write the mac address into the mac fields
+					string[] subStrings = text.Split(':');
+					//if splitting on colons did not yield more than one substring, split on dashes
+					if (subStrings.Length == 1)
+						subStrings = text.Split('-');
+					for (int i = 0; i <= 5; i++)
+						popupFields[i + 2].Text = subStrings[i];
+					JumpToTextBox(8);
+				}
+				//if the pasted text conforms to a singe hex byte, paste it
+				else if (hexByteExpression.Match(text).Success)
+				{
+					int index = Array.IndexOf(popupFields, sender);
+					((TextBox)sender).Text = text;
+					JumpToTextBox(index + 1);
+				}
+			}
+			disable_Textchanged = false;
+		}
+	}
+
+	public enum MessageType
+	{
+		NoNetwork,
+		HostNotFound,
+		LoadingDataFailed
 	}
 }

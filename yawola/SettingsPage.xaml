@@ -8,28 +8,18 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
+    d:DataContext="{d:DesignInstance Type=local:WolTarget}"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance local:DummyData,
-                                     IsDesignTimeCreatable=True}"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="490" Height="350">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Grid Margin="5,5,5,5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Button
-        HorizontalAlignment="Right"
-        VerticalAlignment="Top"
-        Grid.Column = "1"
-        Name="CloseSettingsButton"
-        Click="CloseSettingsButton_Click">
-            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8BB;"/>
-        </Button>
-        <muxc:RadioButtons Header="Data Storage Location">
-            <RadioButton Content="Both" IsChecked="true" Checked="SettingsStorageLocationChanged"/>
-            <RadioButton Content="Roaming" Checked="SettingsStorageLocationChanged"/>
-            <RadioButton Content="Local" Checked="SettingsStorageLocationChanged"/>
-        </muxc:RadioButtons>
+        <StackPanel Orientation="Vertical">
+            <ToggleSwitch x:Name="RoamSettingsSwitch" Header="Use roaming settings:"/>
+            <TextBox x:Name="WakeAttemptInput" Header="Number of wake attempts:" InputScope="Number"/>
+            <TextBox x:Name="DefaultPortInput" Header="Default port used for waking:" InputScope="Number"/>
+        </StackPanel>
     </Grid>
 </Page>

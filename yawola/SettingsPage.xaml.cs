@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -24,17 +25,38 @@ namespace yawola
 	{
 		public SettingsPage()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
+			RoamSettingsSwitch.IsOn = (bool)AppData.GetSetting(AppData.Setting.useRoamingSettings);
+			WakeAttemptInput.Text = ((int)AppData.GetSetting(AppData.Setting.wakeAttemptCount)).ToString();
+			DefaultPortInput.Text = ((int)AppData.GetSetting(AppData.Setting.defaultPort)).ToString();
+			//set event handlers after ui elements are prefilled to avoid firing events unnecessarily
+			RoamSettingsSwitch.Toggled += RoamSettingsSwitch_Toggled;
+			WakeAttemptInput.TextChanged += WakeAttemptInput_TextChanged;
+			DefaultPortInput.TextChanged += DefaultPortInput_TextChanged;
+			SystemNavigationManager view = SystemNavigationManager.GetForCurrentView();
+			view.AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+			view.BackRequested += NavigateBack;
 		}
 
-		private void CloseSettingsButton_Click(object sender, RoutedEventArgs e)
+		private void RoamSettingsSwitch_Toggled(object sender, RoutedEventArgs e)
 		{
-			this.Frame.Navigate(typeof(MainPage));
+			AppData.SwitchLocalOrRoamingData();
+			AppData.UpdateSetting(AppData.Setting.useRoamingSettings, ((ToggleSwitch)sender).IsOn);
 		}
 
-		private void SettingsStorageLocationChanged(object sender, RoutedEventArgs e)
+		private void WakeAttemptInput_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			return;
+			AppData.UpdateSetting(AppData.Setting.wakeAttemptCount, int.Parse(((TextBox)sender).Text));
+		}
+
+		private void DefaultPortInput_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			AppData.UpdateSetting(AppData.Setting.defaultPort, int.Parse(((TextBox)sender).Text));
+		}
+
+		private void NavigateBack(object sender, BackRequestedEventArgs e)
+		{
+			_ = Frame.Navigate(typeof(MainPage));
 		}
 	}
 }

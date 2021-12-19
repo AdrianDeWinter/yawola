@@ -8,6 +8,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Graphics.Display;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -30,8 +31,6 @@ namespace yawola
 		/// </summary>
 		public App()
 		{
-			ApplicationView.PreferredLaunchViewSize = new Size(350, 350);
-			ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 			this.InitializeComponent();
 			this.Suspending += OnSuspending;
 		}
@@ -43,20 +42,20 @@ namespace yawola
 		/// <param name="e">Details about the launch request and process.</param>
 		protected override async void OnLaunched(LaunchActivatedEventArgs e)
 		{
-			Frame rootFrame = Window.Current.Content as Frame;
-
 			// Do not repeat app initialization when the Window already has content,
 			// just ensure that the window is active
-			if (rootFrame == null)
+			if (!(Window.Current.Content is Frame rootFrame))
 			{
 				// Create a Frame to act as the navigation context and navigate to the first page
 				rootFrame = new Frame();
 
 				rootFrame.NavigationFailed += OnNavigationFailed;
-
-				if (e.PreviousExecutionState == ApplicationExecutionState.Terminated || e.PreviousExecutionState == ApplicationExecutionState.ClosedByUser)
+				//unless the app is already running or coming back from suspension, load state from disk
+				if (e.PreviousExecutionState != ApplicationExecutionState.Running && e.PreviousExecutionState != ApplicationExecutionState.Suspended)
 				{
 					await AppData.LoadState();
+					ApplicationView.PreferredLaunchViewSize = new Size(AppData.GetSetting(AppData.Setting.windowWidth), AppData.GetSetting(AppData.Setting.windowHeight));
+					ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 				}
 
 				// Place the frame in the current Window
@@ -96,7 +95,12 @@ namespace yawola
 		/// <param name="e">Details about the suspend request.</param>
 		private async void OnSuspending(object sender, SuspendingEventArgs e)
 		{
-			var deferral = e.SuspendingOperation.GetDeferral();
+			SuspendingDeferral deferral = e.SuspendingOperation.GetDeferral();
+			Rect bounds = ApplicationView.GetForCurrentView().VisibleBounds;
+			double scaleFactor = DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
+			Size size = new Size(bounds.Width * scaleFactor, bounds.Height * scaleFactor);
+			AppData.UpdateSetting(AppData.Setting.windowHeight, size.Height);
+			AppData.UpdateSetting(AppData.Setting.windowWidth, size.Width);
 			await AppData.SaveState();
 			deferral.Complete();
 		}
