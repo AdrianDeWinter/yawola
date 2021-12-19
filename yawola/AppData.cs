@@ -197,6 +197,8 @@ namespace yawola
 				return (byte)o;
 			if (typeOfSetting == typeof(bool))
 				return (bool)o;
+			if (typeOfSetting == typeof(double))
+				return (double)o;
 			return o;
 		}
 		/// <summary>
@@ -227,7 +229,12 @@ namespace yawola
 			if (!settings.Remove(key))
 				throw new ArgumentException("The key \"" + key + "\" does not exist in the settings");
 			settings.Add(key, value);
+			if (debug) {
+				string s = string.Format("Setting \"{0}\" changed to \"{1}\"", key.ToString(), value);
+				Debug.WriteLine(s);
+			}
 		}
+
 		/// <summary>
 		/// Updates a key/value pair in <see cref="settings"/> with a new value
 		/// </summary>
@@ -238,7 +245,14 @@ namespace yawola
 		{
 			if (!settings.TryGetValue(key, out object o))
 				throw new ArgumentException("The key \"" + key + "\" does not exist in the settings");
-			return RestoreTypeOfValue(o);
+			dynamic value = RestoreTypeOfValue(o);
+			if (debug)
+			{
+			//for some reason the string needs to be formulated outside the call to WriteLine, otherwise it fails (VS also warns "the dynamically dispatched call to WriteLine may fail at runtime...")
+				string s = string.Format("Loaded Setting \"{0}\" as \"{1}\"", key.ToString(), Convert.ToString(value));
+				Debug.WriteLine(s);
+			}
+			return value;
 		}
 		/// <summary>
 		/// Serializes the list of <see cref="WolTarget"/>s in <see cref="targets"/> to <see cref="dataFolder"/>/<see cref="hostsFileName"/>
