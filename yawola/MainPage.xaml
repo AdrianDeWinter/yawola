@@ -24,7 +24,7 @@
         </Grid.RowDefinitions>
         <ListView x:Name="TargetList" BorderThickness="2"
                   BorderBrush="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                  Background="#EEEEEE" Margin="5,0,5,5"
+                  Background="{ThemeResource SystemControlBackgroundListLowBrush}" Margin="5,0,5,5"
                   SelectionMode="Single" IsItemClickEnabled="True"
                   Grid.Row="1" ItemClick="TargetList_ItemClick"
                   RightTapped="TargetList_RightTapped"
@@ -88,7 +88,7 @@
             DefaultButton="Primary"
             Opened="ValidateAddHostForm"
             Grid.RowSpan="2"
-            HorizontalAlignment="Stretch">
+            HorizontalAlignment="Stretch" d:IsHidden="True">
             <ContentDialog.TitleTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
